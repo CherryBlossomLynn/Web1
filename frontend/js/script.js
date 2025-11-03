@@ -2764,6 +2764,108 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Filter Dropdown Functionality
+    window.toggleFilterDropdown = function() {
+        const dropdown = document.getElementById('filterDropdown');
+        const button = document.getElementById('filterDropdownBtn');
+        const container = document.querySelector('.filter-dropdown-container');
+        
+        const isVisible = dropdown.style.display !== 'none';
+        
+        if (isVisible) {
+            // Hide dropdown
+            dropdown.style.display = 'none';
+            button.classList.remove('active');
+            container.classList.remove('show');
+        } else {
+            // Show dropdown
+            dropdown.style.display = 'block';
+            button.classList.add('active');
+            container.classList.add('show');
+        }
+    };
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const container = document.querySelector('.filter-dropdown-container');
+        const dropdown = document.getElementById('filterDropdown');
+        const button = document.getElementById('filterDropdownBtn');
+        
+        if (container && !container.contains(event.target)) {
+            dropdown.style.display = 'none';
+            button.classList.remove('active');
+            container.classList.remove('show');
+        }
+    });
+
+    // Apply filters from dropdown to contact search
+    window.applyFilters = function() {
+        console.log('Applying filters from dropdown');
+        
+        // Get values from dropdown filters
+        const roleFilter = document.getElementById('roleFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        console.log('Selected filters - Role:', roleFilter, 'Status:', statusFilter);
+        
+        // Trigger the existing search function which will use these filter values
+        const searchBtn = document.getElementById('searchUserBtn');
+        if (searchBtn && typeof performSearch === 'function') {
+            // Find the performSearch function in the initializeUserSearch scope
+            const searchInput = document.getElementById('userSearchInput');
+            if (searchInput) {
+                // Trigger search event
+                searchBtn.click();
+            }
+        }
+        
+        // Close the dropdown after applying filters
+        const dropdown = document.getElementById('filterDropdown');
+        const button = document.getElementById('filterDropdownBtn');
+        const container = document.querySelector('.filter-dropdown-container');
+        
+        dropdown.style.display = 'none';
+        button.classList.remove('active');
+        container.classList.remove('show');
+        
+        // Show notification about applied filters
+        let filterText = [];
+        if (roleFilter) filterText.push(`Role: ${roleFilter}`);
+        if (statusFilter) filterText.push(`Status: ${statusFilter}`);
+        
+        if (filterText.length > 0) {
+            showNotification(`Filters applied: ${filterText.join(', ')}`, 'success');
+        } else {
+            showNotification('Showing all contacts', 'info');
+        }
+    };
+
+    // Clear all filters in dropdown
+    window.clearFilters = function() {
+        console.log('Clearing all filters');
+        
+        // Reset dropdown filter values
+        document.getElementById('roleFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        
+        // Trigger search to show all results
+        const searchBtn = document.getElementById('searchUserBtn');
+        if (searchBtn && typeof performSearch === 'function') {
+            searchBtn.click();
+        }
+        
+        // Close the dropdown
+        const dropdown = document.getElementById('filterDropdown');
+        const button = document.getElementById('filterDropdownBtn');
+        const container = document.querySelector('.filter-dropdown-container');
+        
+        dropdown.style.display = 'none';
+        button.classList.remove('active');
+        container.classList.remove('show');
+        
+        showNotification('All filters cleared', 'info');
+    };
+
     function applyFilters() {
         const filters = {
             userType: document.getElementById('filterUserType')?.value || '',
@@ -3325,7 +3427,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.logout = logout;
     window.initializeProfileSystem = initializeProfileSystem;
     window.toggleAdvancedSearch = toggleAdvancedSearch;
-    window.applyFilters = applyFilters;
     window.clearFilters = clearFilters;
     window.saveSearch = saveSearch;
     window.loadSavedSearch = loadSavedSearch;

@@ -295,26 +295,56 @@
                                 <i class="fas fa-search" aria-hidden="true"></i>
                                 Search
                             </button>
-                            <button class="filter-btn" onclick="toggleAdvancedSearch()" aria-label="Advanced Filters">
-                                <i class="fas fa-filter"></i>
-                            </button>
+                            <div class="filter-dropdown-container">
+                                <button id="filterDropdownBtn" class="filter-btn" onclick="toggleFilterDropdown()" aria-label="Filter Options">
+                                    <i class="fas fa-filter"></i>
+                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                </button>
+                                <div id="filterDropdown" class="filter-dropdown" style="display: none;">
+                                    <div class="dropdown-header">
+                                        <h4><i class="fas fa-filter"></i> Filter Contacts</h4>
+                                    </div>
+                                    <div class="dropdown-content">
+                                        <div class="filter-group">
+                                            <label for="roleFilter">Filter by Role:</label>
+                                            <select id="roleFilter" aria-label="Filter contacts by role">
+                                                <option value="">All Roles</option>
+                                                <option value="Administrator">Administrator</option>
+                                                <option value="User">User</option>
+                                                <option value="Manager">Manager</option>
+                                                <option value="Moderator">Moderator</option>
+                                            </select>
+                                        </div>
+                                        <div class="filter-group">
+                                            <label for="statusFilter">Filter by Status:</label>
+                                            <select id="statusFilter" aria-label="Filter contacts by status">
+                                                <option value="">All Status</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                                <option value="Away">Away</option>
+                                                <option value="Offline">Offline</option>
+                                            </select>
+                                        </div>
+                                        <div class="filter-actions">
+                                            <button id="applyFiltersBtn" class="apply-filters-btn" onclick="applyFilters()">
+                                                <i class="fas fa-check"></i> Apply Filters
+                                            </button>
+                                            <button id="clearFiltersBtn" class="clear-filters-btn" onclick="clearFilters()">
+                                                <i class="fas fa-times"></i> Clear All
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="search-filters">
-                            <label for="roleFilter" class="sr-only">Filter by role</label>
-                            <select id="roleFilter" aria-label="Filter contacts by role">
+                        <!-- Hidden search filters for backward compatibility -->
+                        <div class="search-filters" style="display: none;">
+                            <select id="roleFilterHidden" aria-label="Filter contacts by role">
                                 <option value="">All Roles</option>
-                                <option value="Admin">Admin</option>
-                                <option value="User">User</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Moderator">Moderator</option>
                             </select>
-                            <label for="statusFilter" class="sr-only">Filter by status</label>
-                            <select id="statusFilter" aria-label="Filter contacts by status">
+                            <select id="statusFilterHidden" aria-label="Filter contacts by status">
                                 <option value="">All Status</option>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Suspended">Suspended</option>
                             </select>
                         </div>
 
