@@ -289,11 +289,15 @@
                         <div class="search-box">
                             <label for="userSearchInput" class="sr-only">Search for contacts</label>
                             <input type="text" id="userSearchInput"
-                                placeholder="Search your contacts by name, email, or role..."
+                                placeholder="Search your contacts or leave empty to show all..."
                                 aria-describedby="search-help">
                             <button id="searchUserBtn" class="search-btn" aria-describedby="search-help">
                                 <i class="fas fa-search" aria-hidden="true"></i>
                                 Search
+                            </button>
+                            <button id="showAllContactsBtn" class="search-btn" onclick="window.showAllContacts();" title="Show all your contacts" style="background: #28a745; margin-left: 10px;">
+                                <i class="fas fa-users" aria-hidden="true"></i>
+                                Show All
                             </button>
                             <button class="filter-btn" onclick="toggleAdvancedSearch()" aria-label="Advanced Filters">
                                 <i class="fas fa-filter"></i>

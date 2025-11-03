@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Show All Button</title>
+</head>
+<body>
+    <h1>Test Show All Button</h1>
+    
+    <!-- Minimal search interface -->
+    <div>
+        <input type="text" id="userSearchInput" placeholder="Search...">
+        <select id="roleFilter">
+            <option value="">All Roles</option>
+        </select>
+        <select id="statusFilter">
+            <option value="">All Status</option>
+        </select>
+        <button id="showAllContactsBtn" onclick="window.showAllContacts();" style="background: #28a745; color: white; padding: 10px;">
+            Show All Contacts
+        </button>
+    </div>
+    
+    <!-- Loading and results -->
+    <div id="searchLoading" style="display: none;">Loading...</div>
+    <div id="searchResults" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 100px;">
+        Results will appear here
+    </div>
+    
+    <!-- Include the script -->
+    <script src="js/script.js"></script>
+    
+    <script>
+        // Simple test to check if the function is available
+        console.log('Testing showAllContacts function...');
+        console.log('showAllContacts exists:', typeof window.showAllContacts);
+        console.log('ContactsManager exists:', typeof window.ContactsManager);
+        if (window.ContactsManager) {
+            console.log('Available contacts:', window.ContactsManager.getAllContacts().length);
+        }
+    </script>
+</body>
+</html>

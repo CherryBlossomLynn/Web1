@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const originalText = loginBtn.innerHTML;
         const capitalizedName = username.charAt(0).toUpperCase() + username.slice(1);
         loginBtn.innerHTML = `<i class="fas fa-check"></i> Welcome ${capitalizedName}!`;
-        loginBtn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+        loginBtn.style.background = 'linear-gradient(45deg, #285ba7ff, #203cc9ff)';
         setTimeout(() => {
             loginBtn.innerHTML = originalText;
         }, 1500);
@@ -1038,6 +1038,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const searchLoading = document.getElementById('searchLoading');
             const searchResults = document.getElementById('searchResults');
 
+            console.log('Performing search with query:', query);
+
             // Show loading state
             searchResults.style.display = 'none';
             searchLoading.style.display = 'block';
@@ -1045,24 +1047,29 @@ document.addEventListener('DOMContentLoaded', function () {
             // Simulate search delay for better UX
             setTimeout(() => {
                 let results = getContactsForSearch();
+                console.log('Found', results.length, 'total contacts');
 
-                // Filter by search query
+                // If no search query, show all contacts
+                // If there is a search query, filter by it
                 if (query) {
                     results = results.filter(user =>
                         user.name.toLowerCase().includes(query) ||
                         user.email.toLowerCase().includes(query) ||
                         user.role.toLowerCase().includes(query)
                     );
+                    console.log('Filtered to', results.length, 'contacts matching query');
                 }
 
                 // Filter by role
                 if (roleFilterValue) {
                     results = results.filter(user => user.role === roleFilterValue);
+                    console.log('Filtered by role to', results.length, 'contacts');
                 }
 
                 // Filter by status
                 if (statusFilterValue) {
                     results = results.filter(user => user.status === statusFilterValue);
+                    console.log('Filtered by status to', results.length, 'contacts');
                 }
 
                 // Hide loading and show results
@@ -1073,16 +1080,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function displaySearchResults(results, query) {
+            console.log('Displaying', results.length, 'contact results');
+            const searchResultsElement = document.getElementById('searchResults');
+            
             if (results.length === 0) {
-                searchResults.innerHTML = `
+                searchResultsElement.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-search"></i>
-                        <p>${query ? `No contacts found for "${query}"` : 'No contacts match your filters'}</p>
-                        <small>Only searching through your added contacts</small>
+                        <p>${query ? `No contacts found for "${query}"` : 'You haven\'t added any contacts yet'}</p>
+                        <small>${query ? 'Only searching through your added contacts' : 'Use the Add Contact button to add contacts to your list'}</small>
                     </div>
                 `;
                 return;
             }
+
+            // Add a header to show what we're displaying
+            const headerText = query ? `Search results for "${query}"` : `All your contacts (${results.length})`;
+            const headerHTML = `
+                <div class="search-results-header">
+                    <h3><i class="fas fa-users"></i> ${headerText}</h3>
+                </div>
+            `;
 
             const resultsHTML = results.map(user => `
                 <div class="user-result contact-result">
@@ -1111,9 +1129,133 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
             `).join('');
-
-            searchResults.innerHTML = resultsHTML;
+            
+            searchResultsElement.innerHTML = headerHTML + resultsHTML;
+            console.log('Successfully displayed', results.length, 'contacts');
         }
+
+        // Global show all contacts function
+        window.showAllContacts = function() {
+            alert('Show All Contacts function is working!');
+            console.log('Show All Contacts function started');
+            
+            // Get elements directly by ID
+            const searchInput = document.getElementById('userSearchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            // Clear search input to show all contacts
+            if (searchInput) searchInput.value = '';
+            // Clear filters to show all contacts
+            if (roleFilter) roleFilter.value = '';
+            if (statusFilter) statusFilter.value = '';
+            
+            // Check if there are contacts to display
+            const allContacts = ContactsManager.getAllContacts();
+            console.log('Show All Contacts clicked. Found contacts:', allContacts.length);
+            
+            // If no contacts exist, show a helpful message
+            if (allContacts.length === 0) {
+                const searchResults = document.getElementById('searchResults');
+                if (searchResults) {
+                    searchResults.style.display = 'block';
+                    searchResults.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-users"></i>
+                            <p>You haven't added any contacts yet</p>
+                            <small>Use the <strong>Add Contact</strong> button above to add contacts to your list</small>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            // Directly display all contacts instead of calling performSearch
+            console.log('Displaying all contacts directly');
+            const searchResults = document.getElementById('searchResults');
+            const searchLoading = document.getElementById('searchLoading');
+            
+            if (searchResults && searchLoading) {
+                // Show loading briefly
+                searchResults.style.display = 'none';
+                searchLoading.style.display = 'block';
+                
+                setTimeout(() => {
+                    // Get all contacts for display
+                    const results = allContacts.map(contact => ({
+                        id: contact.id,
+                        name: contact.name,
+                        email: contact.email,
+                        role: contact.role,
+                        status: contact.status === 'online' ? 'Active' : 'Inactive',
+                        lastSeen: getTimeAgo(contact.lastViewed)
+                    }));
+                    
+                    // Display the results
+                    displayAllContacts(results);
+                    
+                    // Hide loading and show results
+                    searchLoading.style.display = 'none';
+                    searchResults.style.display = 'block';
+                }, 300);
+            }
+        };
+        
+        // Helper function to get time ago
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (hours < 1) return 'Just now';
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (days === 1) return '1 day ago';
+            return `${days} days ago`;
+        }
+        
+        // Helper function to display all contacts
+        function displayAllContacts(results) {
+            const searchResults = document.getElementById('searchResults');
+            if (!searchResults) return;
+            
+            const headerHTML = `
+                <div class="search-results-header">
+                    <h3><i class="fas fa-users"></i> All your contacts (${results.length})</h3>
+                </div>
+            `;
+
+            const resultsHTML = results.map(user => `
+                <div class="user-result contact-result">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-info">
+                        <h4>${user.name}</h4>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Role:</strong> ${user.role}</p>
+                        <p><strong>Last Seen:</strong> ${user.lastSeen}</p>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action-btn view-btn" onclick="viewContactProfile(${user.id})" title="View Profile">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="contact-action-btn message-btn" onclick="sendMessage(${user.id})" title="Send Message">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button class="contact-action-btn favorite-btn" onclick="toggleContactFavorite(${user.id})" title="Add to Favorites">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <div class="user-status ${user.status.toLowerCase()}">
+                        ${user.status}
+                    </div>
+                </div>
+            `).join('');
+            
+            searchResults.innerHTML = headerHTML + resultsHTML;
+            console.log('Successfully displayed', results.length, 'contacts');
+        };
 
         // Event listeners
         if (searchBtn) {
@@ -1135,6 +1277,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (statusFilter) {
             statusFilter.addEventListener('change', performSearch);
         }
+
+        // Show All button is handled via onclick in HTML
 
         // Function to update contact search results display
         function updateContactSearchResults() {
