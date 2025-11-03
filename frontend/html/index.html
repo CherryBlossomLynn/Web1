@@ -101,17 +101,195 @@
 
             <!-- Main Page Content -->
             <div id="mainPage" class="page-content">
+                <!-- My Contacts Section -->
+                <section class="contacts-section">
+                    <div class="contacts-header">
+                        <h2><i class="fas fa-address-book"></i> My Contacts</h2>
+                        <p>Quick access to your favorite contacts and frequently viewed profiles</p>
+                        <button id="addContactBtn" class="add-contact-btn" onclick="document.getElementById('mainPage').style.display='none'; document.getElementById('addContactPage').style.display='block';">
+                            <i class="fas fa-plus"></i> Add Contact
+                        </button>
+                    </div>
+
+                    <div class="contacts-container">
+                        <!-- Favorites Section -->
+                        <div class="contacts-favorites">
+                            <h3><i class="fas fa-star"></i> Favorites</h3>
+                            <div class="contacts-grid" id="favoritesGrid">
+                                <div class="contact-card favorite">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>Lynn Davis</h4>
+                                        <p class="contact-role">Administrator</p>
+                                        <p class="contact-status online">Online</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn" title="Send Message">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn active" title="Remove from Favorites">
+                                            <i class="fas fa-star"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="contact-card">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>Michael Johnson</h4>
+                                        <p class="contact-role">User</p>
+                                        <p class="contact-status away">Away</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn" title="Send Message">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites">
+                                            <i class="far fa-star"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="contact-card">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>Sarah Wilson</h4>
+                                        <p class="contact-role">Manager</p>
+                                        <p class="contact-status offline">Offline</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn" title="View Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn" title="Send Message">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites">
+                                            <i class="far fa-star"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Contacts -->
+                        <div class="contacts-recent">
+                            <h3><i class="fas fa-clock"></i> Recently Viewed</h3>
+                            <div class="recent-contacts-list" id="recentContactsList">
+                                <div class="recent-contact-item">
+                                    <div class="recent-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="recent-info">
+                                        <span class="recent-name">Alex Thompson</span>
+                                        <span class="recent-time">2 hours ago</span>
+                                    </div>
+                                    <button class="quick-view-btn" title="Quick View">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+
+                                <div class="recent-contact-item">
+                                    <div class="recent-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="recent-info">
+                                        <span class="recent-name">Emma Rodriguez</span>
+                                        <span class="recent-time">Yesterday</span>
+                                    </div>
+                                    <button class="quick-view-btn" title="Quick View">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+
+                                <div class="recent-contact-item">
+                                    <div class="recent-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="recent-info">
+                                        <span class="recent-name">David Chen</span>
+                                        <span class="recent-time">3 days ago</span>
+                                    </div>
+                                    <button class="quick-view-btn" title="Quick View">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="contacts-actions">
+                            <button class="contact-action-btn" id="importContactsBtn">
+                                <i class="fas fa-file-import"></i>
+                                Import Contacts
+                            </button>
+                            <button class="contact-action-btn" id="exportContactsBtn">
+                                <i class="fas fa-file-export"></i>
+                                Export Contacts
+                            </button>
+                            <button class="contact-action-btn" id="manageGroupsBtn">
+                                <i class="fas fa-users-cog"></i>
+                                Manage Groups
+                            </button>
+                            <button class="contact-action-btn" id="selectAllContactsBtn" onclick="selectAllContacts()">
+                                <i class="fas fa-check-square"></i>
+                                Select All
+                            </button>
+                        </div>
+
+                        <!-- Bulk Actions Section -->
+                        <div class="contacts-bulk-actions" id="contactsBulkActions" style="display: none;">
+                            <div class="bulk-actions-header">
+                                <div class="bulk-selection-info">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="selectedContactsCount">0 contacts selected</span>
+                                </div>
+                                <div class="bulk-actions-buttons">
+                                    <button class="bulk-action-btn favorite" onclick="bulkAddToFavorites()">
+                                        <i class="fas fa-star"></i>
+                                        Add to Favorites
+                                    </button>
+                                    <button class="bulk-action-btn unfavorite" onclick="bulkRemoveFromFavorites()">
+                                        <i class="far fa-star"></i>
+                                        Remove from Favorites
+                                    </button>
+                                    <button class="bulk-action-btn remove" onclick="bulkRemoveContacts()">
+                                        <i class="fas fa-trash"></i>
+                                        Remove Contacts
+                                    </button>
+                                    <button class="bulk-action-btn cancel" onclick="clearContactSelection()">
+                                        <i class="fas fa-times"></i>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="search-section">
                     <div class="search-header">
-                        <h2><i class="fas fa-search"></i> User Search</h2>
-                        <p>Search and find users in Lynn's Database</p>
+                        <h2><i class="fas fa-search"></i> Contact Search</h2>
+                        <p>Search through your added contacts</p>
                     </div>
 
                     <div class="search-container">
                         <div class="search-box">
-                            <label for="userSearchInput" class="sr-only">Search for users</label>
+                            <label for="userSearchInput" class="sr-only">Search for contacts</label>
                             <input type="text" id="userSearchInput"
-                                placeholder="Search for users by name, email, or role..."
+                                placeholder="Search your contacts by name, email, or role..."
                                 aria-describedby="search-help">
                             <button id="searchUserBtn" class="search-btn" aria-describedby="search-help">
                                 <i class="fas fa-search" aria-hidden="true"></i>
@@ -124,7 +302,7 @@
 
                         <div class="search-filters">
                             <label for="roleFilter" class="sr-only">Filter by role</label>
-                            <select id="roleFilter" aria-label="Filter users by role">
+                            <select id="roleFilter" aria-label="Filter contacts by role">
                                 <option value="">All Roles</option>
                                 <option value="Admin">Admin</option>
                                 <option value="User">User</option>
@@ -132,7 +310,7 @@
                                 <option value="Moderator">Moderator</option>
                             </select>
                             <label for="statusFilter" class="sr-only">Filter by status</label>
-                            <select id="statusFilter" aria-label="Filter users by status">
+                            <select id="statusFilter" aria-label="Filter contacts by status">
                                 <option value="">All Status</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
@@ -202,7 +380,8 @@
                         aria-label="Search results">
                         <div class="no-results">
                             <i class="fas fa-users" aria-hidden="true"></i>
-                            <p>Enter a search term to find users</p>
+                            <p>Enter a search term to find your contacts</p>
+                            <small>Only your added contacts will appear in search results</small>
                         </div>
                     </div>
 
@@ -964,6 +1143,173 @@
                                 Export your data to create a backup. Import to restore settings from a previous backup.
                             </p>
                         </div>
+                </section>
+            </div>
+
+            <!-- Add Contact Page Content (initially hidden) -->
+            <div id="addContactPage" class="page-content" style="display: none;">
+                <section class="add-contact-section">
+                    <div class="page-header">
+                        <button id="backToMainFromAddContact" class="back-btn" onclick="document.getElementById('addContactPage').style.display='none'; document.getElementById('mainPage').style.display='block';">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Contacts
+                        </button>
+                        <h2><i class="fas fa-user-plus"></i> Add New Contact</h2>
+                        <p>Search for users to add them to your contacts</p>
+                    </div>
+
+                    <!-- Enhanced User Search for Adding Contacts -->
+                    <div class="add-contact-search">
+                        <div class="search-header">
+                            <h3><i class="fas fa-search"></i> Find Users</h3>
+                            <p>Search through the database to find and add new contacts</p>
+                        </div>
+
+                        <div class="search-container">
+                            <div class="search-box">
+                                <label for="addContactSearchInput" class="sr-only">Search for users to add</label>
+                                <input type="text" id="addContactSearchInput"
+                                    placeholder="Search by name, email, role, or department..."
+                                    aria-describedby="add-contact-search-help">
+                                <button id="addContactSearchBtn" class="search-btn" aria-describedby="add-contact-search-help">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                    Search
+                                </button>
+                                <button class="filter-btn" onclick="toggleAddContactAdvancedSearch()" aria-label="Advanced Filters">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+
+                            <div class="search-filters">
+                                <label for="addContactRoleFilter" class="sr-only">Filter by role</label>
+                                <select id="addContactRoleFilter" aria-label="Filter users by role">
+                                    <option value="">All Roles</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Moderator">Moderator</option>
+                                    <option value="Developer">Developer</option>
+                                </select>
+                                <label for="addContactStatusFilter" class="sr-only">Filter by status</label>
+                                <select id="addContactStatusFilter" aria-label="Filter users by status">
+                                    <option value="">All Status</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Suspended">Suspended</option>
+                                </select>
+                                <label for="addContactDepartmentFilter" class="sr-only">Filter by department</label>
+                                <select id="addContactDepartmentFilter" aria-label="Filter users by department">
+                                    <option value="">All Departments</option>
+                                    <option value="IT">IT</option>
+                                    <option value="HR">Human Resources</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Sales">Sales</option>
+                                </select>
+                            </div>
+
+                            <div class="advanced-search" id="addContactAdvancedSearch" style="display: none;">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>Registration Date:</label>
+                                        <select id="addContactFilterRegistration">
+                                            <option value="">Any Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                            <option value="year">This Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Sort By:</label>
+                                        <select id="addContactSortBy">
+                                            <option value="name">Name</option>
+                                            <option value="date">Registration Date</option>
+                                            <option value="activity">Last Activity</option>
+                                            <option value="role">Role</option>
+                                            <option value="department">Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Order:</label>
+                                        <select id="addContactSortOrder">
+                                            <option value="asc">Ascending</option>
+                                            <option value="desc">Descending</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="filter-action-btn primary" onclick="applyAddContactFilters()">
+                                            <i class="fas fa-check"></i> Apply
+                                        </button>
+                                        <button class="filter-action-btn secondary" onclick="clearAddContactFilters()">
+                                            <i class="fas fa-times"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions for Add Contact -->
+                            <div class="add-contact-quick-actions">
+                                <button class="quick-action-btn" onclick="showOnlineUsers()">
+                                    <i class="fas fa-circle" style="color: #27ae60;"></i>
+                                    Show Online Users
+                                </button>
+                                <button class="quick-action-btn" onclick="showRecentUsers()">
+                                    <i class="fas fa-clock"></i>
+                                    Recent Signups
+                                </button>
+                                <button class="quick-action-btn" onclick="showSuggestedContacts()">
+                                    <i class="fas fa-magic"></i>
+                                    Suggested Contacts
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Search Results for Add Contact -->
+                        <div id="addContactSearchResults" class="add-contact-search-results" role="region" aria-live="polite"
+                            aria-label="User search results">
+                            <div class="no-results">
+                                <i class="fas fa-user-friends" aria-hidden="true"></i>
+                                <p>Enter a search term to find users to add as contacts</p>
+                                <small>Try searching by name, email, role, or department</small>
+                            </div>
+                        </div>
+
+                        <!-- Loading state -->
+                        <div id="addContactSearchLoading" class="search-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>Searching for users...</p>
+                        </div>
+                    </div>
+
+                    <!-- Recently Added Contacts -->
+                    <div class="recently-added-section">
+                        <h3><i class="fas fa-history"></i> Recently Added</h3>
+                        <div class="recently-added-list" id="recentlyAddedList">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No contacts added recently</p>
+                                <small>Contacts you add will appear here</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions-section" style="display: none;" id="bulkActionsSection">
+                        <div class="bulk-actions-header">
+                            <span id="selectedCount">0 users selected</span>
+                            <div class="bulk-buttons">
+                                <button class="bulk-btn primary" onclick="addSelectedContacts()">
+                                    <i class="fas fa-user-plus"></i>
+                                    Add Selected to Contacts
+                                </button>
+                                <button class="bulk-btn secondary" onclick="clearSelection()">
+                                    <i class="fas fa-times"></i>
+                                    Clear Selection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </div>
 

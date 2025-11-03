@@ -244,14 +244,30 @@ document.addEventListener('DOMContentLoaded', function () {
         // Initialize page navigation
         initializePageNavigation();
 
-        // Initialize user search functionality
+        // Initialize contact search functionality
         initializeUserSearch();
+
+        // Initialize contacts functionality
+        initializeContacts();
 
         // Initialize database stats
         updateDatabaseStats();
 
         // Set up periodic stats update
         setInterval(updateDatabaseStats, 30000); // Update every 30 seconds
+        
+        // Ensure Add Contact button works - Direct event listener as backup
+        setTimeout(function() {
+            const addContactBtn = document.getElementById('addContactBtn');
+            if (addContactBtn && typeof window.addContact === 'function') {
+                // Remove any existing listeners and add a direct one
+                addContactBtn.onclick = function(e) {
+                    e.preventDefault();
+                    window.addContact();
+                    return false;
+                };
+            }
+        }, 100);
     }
 
     function initializePageNavigation() {
@@ -286,7 +302,702 @@ document.addEventListener('DOMContentLoaded', function () {
                 setFocusToFirstElement(mainPage);
             });
         }
+
+        // Add Contact page navigation
+        const backToMainFromAddContact = document.getElementById('backToMainFromAddContact');
+        const addContactPage = document.getElementById('addContactPage');
+        
+        if (backToMainFromAddContact) {
+            backToMainFromAddContact.addEventListener('click', function () {
+                addContactPage.style.display = 'none';
+                mainPage.style.display = 'block';
+                announcePageChange('Main');
+                setFocusToFirstElement(mainPage);
+            });
+        }
     }
+
+    // Global Contacts Management System
+    let globalContacts = [
+        { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local' },
+        { id: 2, name: 'Michael Johnson', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 3600000, email: 'michael@lynnsdatabase.local' },
+        { id: 3, name: 'Sarah Wilson', role: 'Manager', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: 'sarah@lynnsdatabase.local' },
+        { id: 4, name: 'Alex Thompson', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'alex@lynnsdatabase.local' },
+        { id: 5, name: 'Emma Rodriguez', role: 'Manager', status: 'away', favorite: false, lastViewed: Date.now() - 86400000, email: 'emma@lynnsdatabase.local' },
+        { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local' }
+    ];
+
+    // Global Contacts Manager
+    window.ContactsManager = {
+        // Add a new contact to the global list
+        addContact: function(user) {
+            // Check if contact already exists
+            const existingContact = globalContacts.find(c => c.id === user.id);
+            if (existingContact) {
+                showNotification(`${user.name} is already in your contacts`);
+                return false;
+            }
+
+            // Create new contact object
+            const newContact = {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                status: user.status === 'Active' ? 'online' : 'offline',
+                favorite: false,
+                lastViewed: Date.now(),
+                email: user.email,
+                department: user.department || 'Unknown'
+            };
+
+            globalContacts.push(newContact);
+            this.updateAllContactDisplays();
+            showNotification(`${user.name} added to your contacts!`);
+            return true;
+        },
+
+        // Remove a contact from the global list
+        removeContact: function(contactId) {
+            const index = globalContacts.findIndex(c => c.id === contactId);
+            if (index > -1) {
+                const contact = globalContacts[index];
+                globalContacts.splice(index, 1);
+                this.updateAllContactDisplays();
+                showNotification(`${contact.name} removed from contacts`);
+                return true;
+            }
+            return false;
+        },
+
+        // Get all contacts
+        getAllContacts: function() {
+            return [...globalContacts];
+        },
+
+        // Get contact by ID
+        getContact: function(contactId) {
+            return globalContacts.find(c => c.id === contactId);
+        },
+
+        // Update contact's favorite status
+        toggleFavorite: function(contactId) {
+            const contact = globalContacts.find(c => c.id === contactId);
+            if (contact) {
+                contact.favorite = !contact.favorite;
+                this.updateAllContactDisplays();
+                showNotification(contact.favorite ? 'Added to favorites' : 'Removed from favorites');
+                return contact.favorite;
+            }
+            return false;
+        },
+
+        // Update last viewed timestamp
+        updateLastViewed: function(contactId) {
+            const contact = globalContacts.find(c => c.id === contactId);
+            if (contact) {
+                contact.lastViewed = Date.now();
+                this.updateAllContactDisplays();
+            }
+        },
+
+        // Update all displays that show contacts
+        updateAllContactDisplays: function() {
+            updateContactsDisplay();
+            updateContactSearchResults();
+        }
+    };
+
+    function initializeContacts() {
+        // Use global contacts instead of local array
+        const contacts = globalContacts;
+        
+        // Track selected contacts for bulk operations
+        let selectedContactIds = [];
+
+        // Get recently viewed contacts (last 3)
+        function getRecentContacts() {
+            return globalContacts
+                .sort((a, b) => b.lastViewed - a.lastViewed)
+                .slice(0, 3);
+        }
+
+        // Format time ago
+        function timeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (hours < 1) return 'Just now';
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (days === 1) return 'Yesterday';
+            return `${days} days ago`;
+        }
+
+        // Update recent contacts display
+        function updateRecentContacts() {
+            const recentList = document.getElementById('recentContactsList');
+            if (!recentList) return;
+
+            const recentContacts = getRecentContacts();
+            recentList.innerHTML = recentContacts.map(contact => `
+                <div class="recent-contact-item" data-contact-id="${contact.id}">
+                    <div class="recent-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="recent-info">
+                        <span class="recent-name">${contact.name}</span>
+                        <span class="recent-time">${timeAgo(contact.lastViewed)}</span>
+                    </div>
+                    <button class="quick-view-btn" title="Quick View" onclick="viewContactProfile(${contact.id})">
+                        <i class="fas fa-external-link-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Toggle favorite status
+        function toggleFavorite(contactId) {
+            ContactsManager.toggleFavorite(contactId);
+        }
+
+        // Update contacts display
+        function updateContactsDisplay() {
+            const favoritesGrid = document.getElementById('favoritesGrid');
+            if (!favoritesGrid) return;
+
+            // Get all contacts (favorites first)
+            const allContacts = [...globalContacts].sort((a, b) => {
+                if (a.favorite && !b.favorite) return -1;
+                if (!a.favorite && b.favorite) return 1;
+                return 0;
+            });
+
+            favoritesGrid.innerHTML = allContacts.slice(0, 6).map(contact => `
+                <div class="contact-card ${contact.favorite ? 'favorite' : ''}" data-contact-id="${contact.id}">
+                    <div class="contact-checkbox">
+                        <input type="checkbox" class="contact-select-checkbox" data-contact-id="${contact.id}" 
+                               onchange="toggleContactSelection(${contact.id})">
+                    </div>
+                    <div class="contact-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>${contact.name}</h4>
+                        <p class="contact-role">${contact.role}</p>
+                        <p class="contact-status ${contact.status}">${contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}</p>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-btn" title="View Profile" onclick="viewContactProfile(${contact.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="contact-btn" title="Send Message" onclick="sendMessage(${contact.id})">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button class="contact-btn favorite-btn ${contact.favorite ? 'active' : ''}" 
+                                title="${contact.favorite ? 'Remove from Favorites' : 'Add to Favorites'}"
+                                onclick="toggleFavorite(${contact.id})">
+                            <i class="${contact.favorite ? 'fas' : 'far'} fa-star"></i>
+                        </button>
+                        <button class="contact-btn remove-btn" title="Remove Contact" 
+                                onclick="removeContact(${contact.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateRecentContacts();
+        }
+
+        // View contact profile
+        window.viewContactProfile = function(contactId) {
+            const contact = ContactsManager.getContact(contactId);
+            if (contact) {
+                ContactsManager.updateLastViewed(contactId);
+                showNotification(`Viewing ${contact.name}'s profile`);
+                // Here you would typically navigate to the profile page
+            }
+        };
+
+        // Send message
+        window.sendMessage = function(contactId) {
+            const contact = ContactsManager.getContact(contactId);
+            if (contact) {
+                showNotification(`Opening message to ${contact.name}`);
+                // Here you would typically open a message dialog
+            }
+        };
+
+        // Remove contact
+        window.removeContact = function(contactId) {
+            const contact = ContactsManager.getContact(contactId);
+            if (contact) {
+                if (confirm(`Are you sure you want to remove ${contact.name} from your contacts?`)) {
+                    ContactsManager.removeContact(contactId);
+                }
+            }
+        };
+
+        // Bulk management functions
+        window.toggleContactSelection = function(contactId) {
+            const checkbox = document.querySelector(`input[data-contact-id="${contactId}"]`);
+            const contactCard = document.querySelector(`[data-contact-id="${contactId}"]`);
+            
+            if (checkbox.checked) {
+                if (!selectedContactIds.includes(contactId)) {
+                    selectedContactIds.push(contactId);
+                    contactCard.classList.add('selected');
+                }
+            } else {
+                selectedContactIds = selectedContactIds.filter(id => id !== contactId);
+                contactCard.classList.remove('selected');
+            }
+            
+            updateBulkActionsDisplay();
+        };
+
+        window.selectAllContacts = function() {
+            const checkboxes = document.querySelectorAll('.contact-select-checkbox');
+            const selectAllBtn = document.getElementById('selectAllContactsBtn');
+            const isSelectingAll = selectAllBtn.textContent.includes('Select All');
+            
+            checkboxes.forEach(checkbox => {
+                const contactId = parseInt(checkbox.dataset.contactId);
+                const contactCard = document.querySelector(`[data-contact-id="${contactId}"]`);
+                
+                checkbox.checked = isSelectingAll;
+                if (isSelectingAll) {
+                    if (!selectedContactIds.includes(contactId)) {
+                        selectedContactIds.push(contactId);
+                        contactCard.classList.add('selected');
+                    }
+                } else {
+                    selectedContactIds = selectedContactIds.filter(id => id !== contactId);
+                    contactCard.classList.remove('selected');
+                }
+            });
+            
+            selectAllBtn.innerHTML = isSelectingAll 
+                ? '<i class="fas fa-times"></i> Deselect All' 
+                : '<i class="fas fa-check-square"></i> Select All';
+            
+            updateBulkActionsDisplay();
+        };
+
+        window.bulkAddToFavorites = function() {
+            if (selectedContactIds.length === 0) return;
+            
+            let addedCount = 0;
+            selectedContactIds.forEach(contactId => {
+                const contact = ContactsManager.getContact(contactId);
+                if (contact && !contact.favorite) {
+                    ContactsManager.toggleFavorite(contactId);
+                    addedCount++;
+                }
+            });
+            
+            showNotification(`${addedCount} contact${addedCount > 1 ? 's' : ''} added to favorites`);
+            clearContactSelection();
+        };
+
+        window.bulkRemoveFromFavorites = function() {
+            if (selectedContactIds.length === 0) return;
+            
+            let removedCount = 0;
+            selectedContactIds.forEach(contactId => {
+                const contact = ContactsManager.getContact(contactId);
+                if (contact && contact.favorite) {
+                    ContactsManager.toggleFavorite(contactId);
+                    removedCount++;
+                }
+            });
+            
+            showNotification(`${removedCount} contact${removedCount > 1 ? 's' : ''} removed from favorites`);
+            clearContactSelection();
+        };
+
+        window.bulkRemoveContacts = function() {
+            if (selectedContactIds.length === 0) return;
+            
+            const contactNames = selectedContactIds.map(id => {
+                const contact = ContactsManager.getContact(id);
+                return contact ? contact.name : 'Unknown';
+            }).filter(name => name !== 'Unknown');
+            
+            if (confirm(`Are you sure you want to remove ${contactNames.length} contact${contactNames.length > 1 ? 's' : ''} from your contact list?\n\n${contactNames.join(', ')}`)) {
+                selectedContactIds.forEach(contactId => {
+                    ContactsManager.removeContact(contactId);
+                });
+                
+                showNotification(`${contactNames.length} contact${contactNames.length > 1 ? 's' : ''} removed`);
+                clearContactSelection();
+            }
+        };
+
+        window.clearContactSelection = function() {
+            selectedContactIds = [];
+            document.querySelectorAll('.contact-select-checkbox').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.contact-card').forEach(card => card.classList.remove('selected'));
+            const selectAllBtn = document.getElementById('selectAllContactsBtn');
+            if (selectAllBtn) {
+                selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+            }
+            updateBulkActionsDisplay();
+        };
+
+        function updateBulkActionsDisplay() {
+            const bulkActionsSection = document.getElementById('contactsBulkActions');
+            const selectedCountSpan = document.getElementById('selectedContactsCount');
+            
+            if (selectedContactIds.length > 0) {
+                bulkActionsSection.style.display = 'block';
+                selectedCountSpan.textContent = `${selectedContactIds.length} contact${selectedContactIds.length > 1 ? 's' : ''} selected`;
+            } else {
+                bulkActionsSection.style.display = 'none';
+            }
+        }
+
+        // Import contacts
+        window.importContacts = function() {
+            showNotification('Import Contacts feature - coming soon!');
+        };
+
+        // Export contacts
+        window.exportContacts = function() {
+            const contactsData = JSON.stringify(globalContacts, null, 2);
+            const blob = new Blob([contactsData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'contacts.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Contacts exported successfully');
+        };
+
+        // Manage groups
+        window.manageGroups = function() {
+            showNotification('Manage Groups feature - coming soon!');
+        };
+
+        // Event listeners
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'addContactBtn' || e.target.closest('#addContactBtn')) {
+                e.preventDefault();
+                if (typeof window.addContact === 'function') {
+                    window.addContact();
+                }
+            } else if (e.target.id === 'importContactsBtn' || e.target.closest('#importContactsBtn')) {
+                window.importContacts();
+            } else if (e.target.id === 'exportContactsBtn' || e.target.closest('#exportContactsBtn')) {
+                window.exportContacts();
+            } else if (e.target.id === 'manageGroupsBtn' || e.target.closest('#manageGroupsBtn')) {
+                window.manageGroups();
+            }
+        });
+
+        // Initialize contacts display
+        updateContactsDisplay();
+    }
+
+    // Add new contact - Navigate to add contact page (Simple working version)
+    window.addContact = function() {
+        try {
+            const mainPage = document.getElementById('mainPage');
+            const addContactPage = document.getElementById('addContactPage');
+            
+            if (mainPage && addContactPage) {
+                mainPage.style.display = 'none';
+                addContactPage.style.display = 'block';
+                
+                // Optional enhancements (won't break if they fail)
+                try {
+                    if (typeof announcePageChange === 'function') {
+                        announcePageChange('Add Contact');
+                    }
+                    if (typeof setFocusToFirstElement === 'function') {
+                        setFocusToFirstElement(addContactPage);
+                    }
+                    if (typeof window.initializeAddContactPage === 'function') {
+                        window.initializeAddContactPage();
+                    }
+                } catch (e) {
+                    // Ignore optional function errors
+                }
+            }
+        } catch (error) {
+            // Fallback: try direct navigation
+            alert('Navigating to Add Contact page...');
+            const mainPage = document.getElementById('mainPage');
+            const addContactPage = document.getElementById('addContactPage');
+            if (mainPage) mainPage.style.display = 'none';
+            if (addContactPage) addContactPage.style.display = 'block';
+        }
+    };
+
+    // Add Contact Page Functionality
+    window.initializeAddContactPage = function() {
+        // Extended user database for adding contacts
+        const availableUsers = [
+            { id: 1, name: 'Lynn Miller', email: 'lynn@lynnsdatabase.local', role: 'Admin', department: 'IT', status: 'Active', lastSeen: '2 minutes ago', isContact: true },
+            { id: 2, name: 'Michael Johnson', email: 'michael@lynnsdatabase.local', role: 'User', department: 'Marketing', status: 'Active', lastSeen: '5 minutes ago', isContact: true },
+            { id: 3, name: 'Alex Thompson', email: 'alex@lynnsdatabase.local', role: 'Developer', department: 'IT', status: 'Active', lastSeen: '1 hour ago', isContact: false },
+            { id: 4, name: 'Emma Rodriguez', email: 'emma@lynnsdatabase.local', role: 'Manager', department: 'HR', status: 'Active', lastSeen: '30 minutes ago', isContact: false },
+            { id: 5, name: 'David Chen', email: 'david@lynnsdatabase.local', role: 'User', department: 'Finance', status: 'Active', lastSeen: '15 minutes ago', isContact: false },
+            { id: 6, name: 'Sofia Martinez', email: 'sofia@lynnsdatabase.local', role: 'Designer', department: 'Marketing', status: 'Active', lastSeen: '45 minutes ago', isContact: false },
+            { id: 7, name: 'James Wilson', email: 'james@lynnsdatabase.local', role: 'Developer', department: 'IT', status: 'Active', lastSeen: '2 hours ago', isContact: false },
+            { id: 8, name: 'Priya Patel', email: 'priya@lynnsdatabase.local', role: 'Manager', department: 'Sales', status: 'Active', lastSeen: '1 day ago', isContact: false },
+            { id: 9, name: 'Carlos Rodriguez', email: 'carlos@lynnsdatabase.local', role: 'User', department: 'Finance', status: 'Inactive', lastSeen: '3 days ago', isContact: false },
+            { id: 10, name: 'Isabella Brown', email: 'isabella@lynnsdatabase.local', role: 'Moderator', department: 'HR', status: 'Active', lastSeen: '20 minutes ago', isContact: false }
+        ];
+
+        let selectedUsers = [];
+        let recentlyAddedContacts = [];
+
+        function performAddContactSearch() {
+            const query = document.getElementById('addContactSearchInput').value.toLowerCase().trim();
+            const roleFilter = document.getElementById('addContactRoleFilter').value;
+            const statusFilter = document.getElementById('addContactStatusFilter').value;
+            const departmentFilter = document.getElementById('addContactDepartmentFilter').value;
+            const searchResults = document.getElementById('addContactSearchResults');
+            const searchLoading = document.getElementById('addContactSearchLoading');
+
+            // Show loading state
+            searchResults.style.display = 'none';
+            searchLoading.style.display = 'block';
+
+            setTimeout(() => {
+                // Get IDs of existing contacts to exclude them
+                const existingContactIds = ContactsManager.getAllContacts().map(c => c.id);
+                let results = availableUsers.filter(user => !existingContactIds.includes(user.id)); // Only show non-contacts
+
+                // Filter by search query
+                if (query) {
+                    results = results.filter(user =>
+                        user.name.toLowerCase().includes(query) ||
+                        user.email.toLowerCase().includes(query) ||
+                        user.role.toLowerCase().includes(query) ||
+                        user.department.toLowerCase().includes(query)
+                    );
+                }
+
+                // Apply filters
+                if (roleFilter) results = results.filter(user => user.role === roleFilter);
+                if (statusFilter) results = results.filter(user => user.status === statusFilter);
+                if (departmentFilter) results = results.filter(user => user.department === departmentFilter);
+
+                displayAddContactResults(results);
+                searchLoading.style.display = 'none';
+                searchResults.style.display = 'block';
+            }, 800);
+        }
+
+        function displayAddContactResults(users) {
+            const searchResults = document.getElementById('addContactSearchResults');
+            
+            if (users.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-user-friends"></i>
+                        <p>No users found</p>
+                        <small>Try adjusting your search criteria</small>
+                    </div>
+                `;
+                return;
+            }
+
+            searchResults.innerHTML = users.map(user => `
+                <div class="user-result-card ${selectedUsers.includes(user.id) ? 'selected' : ''}" data-user-id="${user.id}">
+                    <input type="checkbox" class="select-checkbox" ${selectedUsers.includes(user.id) ? 'checked' : ''} 
+                           onchange="toggleUserSelection(${user.id})">
+                    <div class="user-result-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-result-info">
+                        <h4>${user.name}</h4>
+                        <div class="user-result-meta">
+                            <span><i class="fas fa-envelope"></i> ${user.email}</span>
+                            <span><i class="fas fa-user-tag"></i> ${user.role}</span>
+                            <span><i class="fas fa-building"></i> ${user.department}</span>
+                            <span><i class="fas fa-clock"></i> ${user.lastSeen}</span>
+                        </div>
+                        <span class="user-result-status ${user.status.toLowerCase()}">${user.status}</span>
+                    </div>
+                    <div class="user-result-actions">
+                        <button class="add-contact-btn-result" onclick="addSingleContact(${user.id})" 
+                                ${recentlyAddedContacts.includes(user.id) ? 'class="added"' : ''}>
+                            <i class="fas ${recentlyAddedContacts.includes(user.id) ? 'fa-check' : 'fa-user-plus'}"></i>
+                            ${recentlyAddedContacts.includes(user.id) ? 'Added' : 'Add Contact'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateBulkActions();
+        }
+
+        // Global functions for add contact page
+        window.toggleUserSelection = function(userId) {
+            if (selectedUsers.includes(userId)) {
+                selectedUsers = selectedUsers.filter(id => id !== userId);
+            } else {
+                selectedUsers.push(userId);
+            }
+            updateBulkActions();
+            
+            // Update visual state
+            const card = document.querySelector(`[data-user-id="${userId}"]`);
+            if (card) {
+                card.classList.toggle('selected', selectedUsers.includes(userId));
+            }
+        };
+
+        window.addSingleContact = function(userId) {
+            const user = availableUsers.find(u => u.id === userId);
+            if (user && !recentlyAddedContacts.includes(userId)) {
+                // Add to global contacts using ContactsManager
+                if (ContactsManager.addContact(user)) {
+                    user.isContact = true;
+                    recentlyAddedContacts.push(userId);
+                    updateRecentlyAdded(user);
+                    
+                    // Update button state
+                    const button = document.querySelector(`[data-user-id="${userId}"] .add-contact-btn-result`);
+                    if (button) {
+                        button.innerHTML = '<i class="fas fa-check"></i> Added';
+                        button.classList.add('added');
+                    }
+                }
+            }
+        };
+
+        window.addSelectedContacts = function() {
+            const usersToAdd = availableUsers.filter(u => selectedUsers.includes(u.id));
+            let addedCount = 0;
+            
+            usersToAdd.forEach(user => {
+                if (ContactsManager.addContact(user)) {
+                    user.isContact = true;
+                    if (!recentlyAddedContacts.includes(user.id)) {
+                        recentlyAddedContacts.push(user.id);
+                        updateRecentlyAdded(user);
+                    }
+                    addedCount++;
+                }
+            });
+            
+            if (addedCount > 0) {
+                showNotification(`${addedCount} contact${addedCount > 1 ? 's' : ''} added to your contact list!`);
+            }
+            selectedUsers = [];
+            performAddContactSearch(); // Refresh results
+        };
+
+        window.clearSelection = function() {
+            selectedUsers = [];
+            updateBulkActions();
+            document.querySelectorAll('.select-checkbox').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.user-result-card').forEach(card => card.classList.remove('selected'));
+        };
+
+        function updateBulkActions() {
+            const bulkSection = document.getElementById('bulkActionsSection');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedUsers.length > 0) {
+                bulkSection.style.display = 'block';
+                selectedCount.textContent = `${selectedUsers.length} user${selectedUsers.length > 1 ? 's' : ''} selected`;
+            } else {
+                bulkSection.style.display = 'none';
+            }
+        }
+
+        function updateRecentlyAdded(user) {
+            const recentlyAddedList = document.getElementById('recentlyAddedList');
+            
+            if (recentlyAddedContacts.length === 1) {
+                recentlyAddedList.innerHTML = '';
+            }
+            
+            const recentItem = document.createElement('div');
+            recentItem.className = 'recently-added-item';
+            recentItem.innerHTML = `
+                <div class="recently-added-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="recently-added-info">
+                    <h5>${user.name}</h5>
+                    <small>Added just now • ${user.role} in ${user.department}</small>
+                </div>
+            `;
+            
+            recentlyAddedList.insertBefore(recentItem, recentlyAddedList.firstChild);
+        }
+
+        // Quick action functions
+        window.showOnlineUsers = function() {
+            document.getElementById('addContactStatusFilter').value = 'Active';
+            document.getElementById('addContactSearchInput').value = '';
+            performAddContactSearch();
+        };
+
+        window.showRecentUsers = function() {
+            document.getElementById('addContactSearchInput').value = '';
+            performAddContactSearch();
+            showNotification('Showing all available users');
+        };
+
+        window.showSuggestedContacts = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser === 'lynn') {
+                document.getElementById('addContactDepartmentFilter').value = 'IT';
+            }
+            performAddContactSearch();
+            showNotification('Showing suggested contacts based on your profile');
+        };
+
+        // Advanced search toggle
+        window.toggleAddContactAdvancedSearch = function() {
+            const advancedSearch = document.getElementById('addContactAdvancedSearch');
+            advancedSearch.style.display = advancedSearch.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.applyAddContactFilters = function() {
+            performAddContactSearch();
+            showNotification('Filters applied');
+        };
+
+        window.clearAddContactFilters = function() {
+            document.getElementById('addContactRoleFilter').value = '';
+            document.getElementById('addContactStatusFilter').value = '';
+            document.getElementById('addContactDepartmentFilter').value = '';
+            document.getElementById('addContactFilterRegistration').value = '';
+            performAddContactSearch();
+            showNotification('Filters cleared');
+        };
+
+        // Event listeners
+        const searchBtn = document.getElementById('addContactSearchBtn');
+        const searchInput = document.getElementById('addContactSearchInput');
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', performAddContactSearch);
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performAddContactSearch();
+                }
+            });
+        }
+
+        // Filter change listeners
+        document.getElementById('addContactRoleFilter').addEventListener('change', performAddContactSearch);
+        document.getElementById('addContactStatusFilter').addEventListener('change', performAddContactSearch);
+        document.getElementById('addContactDepartmentFilter').addEventListener('change', performAddContactSearch);
+    };
 
     function initializeUserSearch() {
         const searchBtn = document.getElementById('searchUserBtn');
@@ -295,17 +1006,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const statusFilter = document.getElementById('statusFilter');
         const searchResults = document.getElementById('searchResults');
 
-        // Sample user database for searching
-        const userDatabase = [
-            { id: 1, name: 'Lynn Miller', email: 'lynn@lynnsdatabase.local', role: 'Admin', status: 'Active', lastSeen: '2 minutes ago' },
-            { id: 2, name: 'Michael Johnson', email: 'michael@lynnsdatabase.local', role: 'User', status: 'Active', lastSeen: '5 minutes ago' },
-            { id: 3, name: 'Sarah Wilson', email: 'sarah@lynnsdatabase.local', role: 'Manager', status: 'Active', lastSeen: '1 hour ago' },
-            { id: 4, name: 'John Smith', email: 'john@lynnsdatabase.local', role: 'User', status: 'Inactive', lastSeen: '2 days ago' },
-            { id: 5, name: 'Emma Davis', email: 'emma@lynnsdatabase.local', role: 'User', status: 'Active', lastSeen: '30 minutes ago' },
-            { id: 6, name: 'David Brown', email: 'david@lynnsdatabase.local', role: 'Admin', status: 'Active', lastSeen: '1 minute ago' },
-            { id: 7, name: 'Lisa Garcia', email: 'lisa@lynnsdatabase.local', role: 'Manager', status: 'Active', lastSeen: '15 minutes ago' },
-            { id: 8, name: 'Ryan Martinez', email: 'ryan@lynnsdatabase.local', role: 'User', status: 'Inactive', lastSeen: '1 week ago' }
-        ];
+        // Get contacts from the global contacts management system
+        function getContactsForSearch() {
+            return ContactsManager.getAllContacts().map(contact => ({
+                id: contact.id,
+                name: contact.name,
+                email: contact.email,
+                role: contact.role,
+                status: contact.status === 'online' ? 'Active' : 'Inactive',
+                lastSeen: getTimeAgo(contact.lastViewed)
+            }));
+        }
+
+        // Helper function to format time ago
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (hours < 1) return 'Just now';
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (days === 1) return '1 day ago';
+            return `${days} days ago`;
+        }
 
         function performSearch() {
             const query = searchInput.value.toLowerCase().trim();
@@ -320,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Simulate search delay for better UX
             setTimeout(() => {
-                let results = userDatabase;
+                let results = getContactsForSearch();
 
                 // Filter by search query
                 if (query) {
@@ -353,22 +1077,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchResults.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-search"></i>
-                        <p>${query ? `No users found for "${query}"` : 'No users match your filters'}</p>
+                        <p>${query ? `No contacts found for "${query}"` : 'No contacts match your filters'}</p>
+                        <small>Only searching through your added contacts</small>
                     </div>
                 `;
                 return;
             }
 
             const resultsHTML = results.map(user => `
-                <div class="user-result">
+                <div class="user-result contact-result">
                     <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-circle"></i>
                     </div>
                     <div class="user-info">
                         <h4>${user.name}</h4>
                         <p><strong>Email:</strong> ${user.email}</p>
                         <p><strong>Role:</strong> ${user.role}</p>
                         <p><strong>Last Seen:</strong> ${user.lastSeen}</p>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action-btn view-btn" onclick="viewContactProfile(${user.id})" title="View Profile">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="contact-action-btn message-btn" onclick="sendMessage(${user.id})" title="Send Message">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button class="contact-action-btn favorite-btn" onclick="toggleContactFavorite(${user.id})" title="Add to Favorites">
+                            <i class="fas fa-star"></i>
+                        </button>
                     </div>
                     <div class="user-status ${user.status.toLowerCase()}">
                         ${user.status}
@@ -398,6 +1134,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (statusFilter) {
             statusFilter.addEventListener('change', performSearch);
+        }
+
+        // Function to update contact search results display
+        function updateContactSearchResults() {
+            // Re-run the search if there's an active search
+            const searchInput = document.getElementById('userSearchInput');
+            if (searchInput && searchInput.value.trim()) {
+                performSearch();
+            }
+        }
+
+        // Global functions for contact search actions (avoid duplicate definitions)
+        if (typeof window.viewContactProfile === 'undefined') {
+            window.viewContactProfile = function(contactId) {
+                const contact = ContactsManager.getContact(contactId);
+                if (contact) {
+                    ContactsManager.updateLastViewed(contactId);
+                    showNotification(`Viewing ${contact.name}'s profile`);
+                    // Here you would typically navigate to the profile page
+                }
+            };
+
+            window.sendMessage = function(contactId) {
+                const contact = ContactsManager.getContact(contactId);
+                if (contact) {
+                    showNotification(`Opening message to ${contact.name}`);
+                    // Here you would typically open a message dialog
+                }
+            };
+
+            window.toggleContactFavorite = function(contactId) {
+                ContactsManager.toggleFavorite(contactId);
+            };
         }
     }
 
@@ -904,15 +1673,29 @@ document.addEventListener('DOMContentLoaded', function () {
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
+        // Create unique ID for this notification
+        const notificationId = 'notif_' + Date.now() + Math.random().toString(36).substr(2, 9);
+        notification.id = notificationId;
+        
         notification.innerHTML = `
             <div class="notification-content">
                 <i class="fas ${getNotificationIcon(type)}"></i>
                 <span>${message}</span>
-                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                <button class="notification-close" onclick="closeNotification('${notificationId}')" title="Close notification">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
+
+        // Add click-to-close on the entire notification as backup
+        notification.addEventListener('click', function(e) {
+            // Only close if clicking the close button or notification background
+            if (e.target.classList.contains('notification-close') || 
+                e.target.classList.contains('fa-times') ||
+                e.target === notification) {
+                window.closeNotification(notificationId);
+            }
+        });
 
         // Add to document
         document.body.appendChild(notification);
@@ -932,6 +1715,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 300);
         }, duration);
     }
+
+    // Global function to close notifications
+    window.closeNotification = function(notificationId) {
+        const notification = document.getElementById(notificationId);
+        if (notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    };
 
     function getNotificationIcon(type) {
         switch (type) {
@@ -2355,6 +3151,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!messagesModal) {
             messagesModal = createMessagesModal();
             document.body.appendChild(messagesModal);
+            
+            // The close button now uses direct onclick in the HTML for reliability
+            
+            // Add click outside to close
+            messagesModal.onclick = function(e) {
+                if (e.target === messagesModal) {
+                    messagesModal.style.display = 'none';
+                }
+            };
         }
         
         // Show the modal
@@ -2376,7 +3181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="modal-content">
                 <div class="modal-header">
                     <h2><i class="fas fa-envelope"></i> Messages</h2>
-                    <button class="close-btn" onclick="closeMessagesModal()">&times;</button>
+                    <button onclick="document.getElementById('messagesModal').style.display='none';" style="background: none; border: none; font-size: 28px; cursor: pointer; padding: 8px 12px; color: #666; z-index: 9999; position: relative; border-radius: 4px; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'; this.style.color='#333';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#666';" title="Close Messages">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="messages-container">
@@ -2475,7 +3280,9 @@ document.addEventListener('DOMContentLoaded', function () {
     window.showMessages = showMessages;
     window.closeMessagesModal = function() {
         const modal = document.getElementById('messagesModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+        }
     };
     window.acceptFriendRequest = function(id) {
         showNotification('Friend request accepted!', 'success');

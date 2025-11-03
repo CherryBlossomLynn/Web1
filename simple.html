@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lynn's Database - Simple Version</title>
+    <link rel="stylesheet" href="frontend/css/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .page { padding: 20px; border: 2px solid #ccc; margin: 10px 0; }
+        .hidden { display: none; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Lynn's Database - Simple Test</h1>
+    
+    <!-- Main Page -->
+    <div id="mainPage" class="page">
+        <h2>Main Page</h2>
+        <p>My Contacts Section</p>
+        <button id="addContactBtn">Add Contact</button>
+    </div>
+    
+    <!-- Add Contact Page -->
+    <div id="addContactPage" class="page hidden">
+        <h2>Add Contact Page</h2>
+        <p>Search for users to add to your contacts</p>
+        <button id="backToMain">Back to Main</button>
+    </div>
+    
+    <script>
+        console.log('Simple page starting...');
+        
+        // Add Contact functionality
+        window.addContact = function() {
+            console.log('addContact called');
+            const mainPage = document.getElementById('mainPage');
+            const addContactPage = document.getElementById('addContactPage');
+            
+            console.log('mainPage:', mainPage);
+            console.log('addContactPage:', addContactPage);
+            
+            if (mainPage && addContactPage) {
+                mainPage.classList.add('hidden');
+                addContactPage.classList.remove('hidden');
+                console.log('Pages switched successfully');
+            } else {
+                console.error('Could not find page elements');
+            }
+        };
+        
+        // Back to main functionality
+        window.backToMain = function() {
+            console.log('backToMain called');
+            const mainPage = document.getElementById('mainPage');
+            const addContactPage = document.getElementById('addContactPage');
+            
+            if (mainPage && addContactPage) {
+                mainPage.classList.remove('hidden');
+                addContactPage.classList.add('hidden');
+                console.log('Back to main successful');
+            }
+        };
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            const addContactBtn = document.getElementById('addContactBtn');
+            const backToMainBtn = document.getElementById('backToMain');
+            
+            console.log('addContactBtn:', addContactBtn);
+            console.log('backToMainBtn:', backToMainBtn);
+            
+            if (addContactBtn) {
+                addContactBtn.addEventListener('click', function() {
+                    console.log('Add Contact button clicked via event listener');
+                    window.addContact();
+                });
+            }
+            
+            if (backToMainBtn) {
+                backToMainBtn.addEventListener('click', function() {
+                    console.log('Back button clicked');
+                    window.backToMain();
+                });
+            }
+            
+            console.log('All event listeners attached');
+        });
+        
+        console.log('Script loaded successfully');
+    </script>
+</body>
+</html>

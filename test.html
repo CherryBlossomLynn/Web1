@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <button id="testBtn" onclick="alert('Button works!')">Test Button</button>
+    
+    <div id="mainPage" style="background: lightblue; padding: 20px; margin: 10px;">
+        <h2>Main Page</h2>
+        <button onclick="switchToAddContact()">Switch to Add Contact</button>
+    </div>
+    
+    <div id="addContactPage" style="background: lightgreen; padding: 20px; margin: 10px; display: none;">
+        <h2>Add Contact Page</h2>
+        <button onclick="switchToMain()">Back to Main</button>
+    </div>
+    
+    <script>
+        function switchToAddContact() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('addContactPage').style.display = 'block';
+        }
+        
+        function switchToMain() {
+            document.getElementById('mainPage').style.display = 'block';
+            document.getElementById('addContactPage').style.display = 'none';
+        }
+        
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>
