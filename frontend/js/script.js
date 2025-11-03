@@ -1136,7 +1136,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Global show all contacts function
         window.showAllContacts = function() {
-            alert('Show All Contacts function is working!');
             console.log('Show All Contacts function started');
             
             // Get elements directly by ID
