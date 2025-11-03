@@ -324,7 +324,8 @@ document.addEventListener('DOMContentLoaded', function () {
         { id: 3, name: 'Sarah Wilson', role: 'Manager', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: 'sarah@lynnsdatabase.local' },
         { id: 4, name: 'Alex Thompson', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'alex@lynnsdatabase.local' },
         { id: 5, name: 'Emma Rodriguez', role: 'Manager', status: 'away', favorite: false, lastViewed: Date.now() - 86400000, email: 'emma@lynnsdatabase.local' },
-        { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local' }
+        { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local' },
+        { id: 7, name: 'Jessica Park', role: 'Moderator', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'jessica@lynnsdatabase.local' }
     ];
 
     // Global Contacts Manager
@@ -1013,9 +1014,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 name: contact.name,
                 email: contact.email,
                 role: contact.role,
-                status: contact.status === 'online' ? 'Active' : 'Inactive',
+                status: mapContactStatus(contact.status),
                 lastSeen: getTimeAgo(contact.lastViewed)
             }));
+        }
+
+        // Helper function to map contact status to display format
+        function mapContactStatus(status) {
+            switch(status) {
+                case 'online': return 'Active';
+                case 'away': return 'Away';
+                case 'offline': return 'Offline';
+                default: return 'Inactive';
+            }
         }
 
         // Helper function to format time ago
