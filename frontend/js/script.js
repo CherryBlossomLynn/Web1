@@ -250,6 +250,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Initialize contacts functionality
         initializeContacts();
 
+        // Force contact display update after a short delay to ensure DOM is ready
+        setTimeout(function() {
+            if (typeof window.updateContactsDisplay === 'function') {
+                console.log('Forcing contact display update...');
+                window.updateContactsDisplay();
+            }
+        }, 500);
+
         // Initialize database stats
         updateDatabaseStats();
 
@@ -461,6 +469,9 @@ document.addEventListener('DOMContentLoaded', function () {
             `).join('');
         }
 
+        // Make updateRecentContacts available globally immediately after definition
+        window.updateRecentContacts = updateRecentContacts;
+
         // Toggle favorite status
         function toggleFavorite(contactId) {
             ContactsManager.toggleFavorite(contactId);
@@ -468,8 +479,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update contacts display
         function updateContactsDisplay() {
+            console.log('updateContactsDisplay called');
             const favoritesGrid = document.getElementById('favoritesGrid');
-            if (!favoritesGrid) return;
+            if (!favoritesGrid) {
+                console.log('favoritesGrid element not found');
+                return;
+            }
+            console.log('Updating contact display with', globalContacts.length, 'contacts');
 
             // Get all contacts (favorites first)
             const allContacts = [...globalContacts].sort((a, b) => {
@@ -514,6 +530,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             updateRecentContacts();
         }
+
+        // Make updateContactsDisplay available globally immediately after definition
+        window.updateContactsDisplay = updateContactsDisplay;
 
         // View contact profile
         window.viewContactProfile = function(contactId) {
