@@ -531,16 +531,17 @@ h1 {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    border: 2px solid transparent;
+    border: 2px solid rgba(102, 126, 234, 0.4);
     transition: all 0.3s ease;
     position: relative;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .contact-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-color: rgba(102, 126, 234, 0.7);
 }
 
 .contact-card.favorite::before {
@@ -619,6 +620,18 @@ h1 {
 
 .contact-btn:hover {
     background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+}
+
+.contact-btn.delete-btn {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+
+.contact-btn.delete-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: rgba(231, 76, 60, 0.5);
     transform: scale(1.1);
 }
 
@@ -4822,5 +4835,79 @@ select:focus-visible {
     
     .message-actions button {
         width: 100%;
+    }
+}
+
+/* Inline Search Header Styling */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.inline-search {
+    max-width: 400px;
+    margin: 0;
+}
+
+.inline-search .search-box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.inline-search .search-box input {
+    max-width: 200px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.inline-search .search-btn {
+    padding: 8px 12px;
+    min-width: auto;
+}
+
+.inline-search .search-btn i {
+    margin: 0;
+}
+
+.inline-search .filter-btn {
+    padding: 8px;
+    min-width: auto;
+}
+
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .header-actions {
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .inline-search {
+        max-width: 100%;
+    }
+    
+    .inline-search .search-box {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }

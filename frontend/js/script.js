@@ -22,6 +22,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (localStorage.getItem('isLoggedIn') === 'true') {
         showMainContent();
     }
+    
+    // Force load contacts if main content is already visible after a delay
+    setTimeout(() => {
+        const mainContentDiv = document.getElementById('mainContent');
+        if (mainContentDiv && mainContentDiv.style.display !== 'none') {
+            console.log("🔄 Main content visible, initializing contacts");
+            // Initialize contacts first, then call the display functions
+            initializeMainPage();
+        }
+    }, 500);
 
     // Login form submission
     if (loginForm) {
@@ -80,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function () {
         initializeMainPage();
         initializeAccountFeatures();
         updateMessageBadge();
+        
+        // Immediately load and display contacts
+        console.log("🔄 Loading contacts from showMainContent");
+        updateContactsDisplay();
+        updateRecentContacts();
     }
 
     function loadUserProfile(username) {
@@ -531,8 +546,8 @@ document.addEventListener('DOMContentLoaded', function () {
             updateRecentContacts();
         }
 
-        // Make updateContactsDisplay available globally immediately after definition
-        window.updateContactsDisplay = updateContactsDisplay;
+        // Functions will be made available globally at the end of initializeContacts
+        console.log("🚀 Contact display functions defined");
 
         // View contact profile
         window.viewContactProfile = function(contactId) {
@@ -721,12 +736,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Initialize contacts display
-        updateContactsDisplay();
-        
-        // Make functions available globally
+        // Make functions available globally first
         window.updateContactsDisplay = updateContactsDisplay;
         window.updateRecentContacts = updateRecentContacts;
+        
+        // Initialize contacts display immediately
+        console.log("🎯 End of initializeContacts - calling display functions");
+        updateContactsDisplay();
+        updateRecentContacts();
     }
 
     // Add new contact - Navigate to add contact page (Simple working version)
@@ -3486,4 +3503,75 @@ document.addEventListener('DOMContentLoaded', function () {
     window.saveNotificationPrefs = saveNotificationPrefs;
     window.clearNotifications = clearNotifications;
     window.closeModal = closeModal;
+
+    // Essential contact functions for static HTML
+    window.toggleFavorite = function(contactId) {
+        const contact = globalContacts.find(c => c.id === contactId);
+        const card = document.querySelector(`[data-contact-id="${contactId}"]`);
+        const favoriteBtn = card.querySelector('.favorite-btn');
+        
+        if (contact) {
+            contact.favorite = !contact.favorite;
+            
+            if (contact.favorite) {
+                card.classList.add('favorite');
+                favoriteBtn.classList.add('active');
+                favoriteBtn.title = 'Remove from favorites';
+                showNotification(`${contact.name} added to favorites`);
+            } else {
+                card.classList.remove('favorite');
+                favoriteBtn.classList.remove('active');
+                favoriteBtn.title = 'Add to favorites';
+                showNotification(`${contact.name} removed from favorites`);
+            }
+        }
+    };
+
+    window.removeContact = function(contactId) {
+        const contact = globalContacts.find(c => c.id === contactId);
+        if (contact) {
+            if (confirm(`Are you sure you want to remove ${contact.name} from your contacts?`)) {
+                const card = document.querySelector(`[data-contact-id="${contactId}"]`);
+                if (card) {
+                    card.style.animation = 'fadeOut 0.3s ease-out forwards';
+                    setTimeout(() => {
+                        card.remove();
+                        showNotification(`${contact.name} removed from contacts`);
+                    }, 300);
+                }
+                // Remove from globalContacts array
+                const index = globalContacts.findIndex(c => c.id === contactId);
+                if (index > -1) {
+                    globalContacts.splice(index, 1);
+                }
+            }
+        }
+    };
+
+    window.toggleContactSelection = function(contactId) {
+        const checkbox = document.querySelector(`input[data-contact-id="${contactId}"]`);
+        const contactCard = document.querySelector(`[data-contact-id="${contactId}"]`);
+        
+        if (checkbox && contactCard) {
+            if (checkbox.checked) {
+                contactCard.classList.add('selected');
+            } else {
+                contactCard.classList.remove('selected');
+            }
+        }
+    };
+
+    window.viewContactProfile = function(contactId) {
+        const contact = globalContacts.find(c => c.id === contactId);
+        if (contact) {
+            showNotification(`Viewing ${contact.name}'s profile`);
+        }
+    };
+
+    window.sendMessage = function(contactId) {
+        const contact = globalContacts.find(c => c.id === contactId);
+        if (contact) {
+            showNotification(`Opening message to ${contact.name}`);
+        }
+    };
 });

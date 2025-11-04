@@ -104,11 +104,69 @@
                 <!-- My Contacts Section -->
                 <section class="contacts-section">
                     <div class="contacts-header">
-                        <h2><i class="fas fa-address-book"></i> My Contacts</h2>
-                        <p>Quick access to your favorite contacts and frequently viewed profiles</p>
-                        <button id="addContactBtn" class="add-contact-btn" onclick="document.getElementById('mainPage').style.display='none'; document.getElementById('addContactPage').style.display='block';">
-                            <i class="fas fa-plus"></i> Add Contact
-                        </button>
+                        <div class="header-top">
+                            <div class="header-info">
+                                <h2><i class="fas fa-address-book"></i> My Contacts</h2>
+                                <p>Quick access to your favorite contacts and frequently viewed profiles</p>
+                            </div>
+                            <div class="header-actions">
+                                <div class="search-container inline-search">
+                                    <div class="search-box">
+                                        <label for="userSearchInput" class="sr-only">Search for contacts</label>
+                                        <input type="text" id="userSearchInput"
+                                            placeholder="Search contacts..."
+                                            aria-describedby="search-help">
+                                        <button id="searchUserBtn" class="search-btn" aria-describedby="search-help">
+                                            <i class="fas fa-search" aria-hidden="true"></i>
+                                        </button>
+                                        <div class="filter-dropdown-container">
+                                            <button id="filterDropdownBtn" class="filter-btn" onclick="toggleFilterDropdown()" aria-label="Filter Options">
+                                                <i class="fas fa-filter"></i>
+                                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                            </button>
+                                            <div id="filterDropdown" class="filter-dropdown" style="display: none;">
+                                                <div class="dropdown-header">
+                                                    <h4><i class="fas fa-filter"></i> Filter Contacts</h4>
+                                                </div>
+                                                <div class="dropdown-content">
+                                                    <div class="filter-group">
+                                                        <label for="roleFilter">Filter by Role:</label>
+                                                        <select id="roleFilter" aria-label="Filter contacts by role">
+                                                            <option value="">All Roles</option>
+                                                            <option value="Administrator">Administrator</option>
+                                                            <option value="User">User</option>
+                                                            <option value="Manager">Manager</option>
+                                                            <option value="Moderator">Moderator</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="filter-group">
+                                                        <label for="statusFilter">Filter by Status:</label>
+                                                        <select id="statusFilter" aria-label="Filter contacts by status">
+                                                            <option value="">All Status</option>
+                                                            <option value="Active">Active</option>
+                                                            <option value="Inactive">Inactive</option>
+                                                            <option value="Away">Away</option>
+                                                            <option value="Offline">Offline</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="filter-actions">
+                                                        <button id="applyFiltersBtn" class="apply-btn">
+                                                            <i class="fas fa-check"></i> Apply Filters
+                                                        </button>
+                                                        <button id="clearFiltersBtn" class="clear-btn">
+                                                            <i class="fas fa-times"></i> Clear
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button id="addContactBtn" class="add-contact-btn" onclick="document.getElementById('mainPage').style.display='none'; document.getElementById('addContactPage').style.display='block';">
+                                    <i class="fas fa-plus"></i> Add Contact
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="contacts-container">
@@ -116,7 +174,8 @@
                         <div class="contacts-favorites">
                             <h3><i class="fas fa-star"></i> Favorites</h3>
                             <div class="contacts-grid" id="favoritesGrid">
-                                <div class="contact-card favorite">
+                                <!-- Contact Card 1 - Lynn Davis (Administrator) -->
+                                <div class="contact-card" data-contact-id="1">
                                     <div class="contact-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
@@ -126,19 +185,20 @@
                                         <p class="contact-status online">Online</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn" title="View Profile">
+                                        <button class="contact-btn">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn" title="Send Message">
+                                        <button class="contact-btn">
                                             <i class="fas fa-envelope"></i>
                                         </button>
-                                        <button class="contact-btn favorite-btn active" title="Remove from Favorites">
-                                            <i class="fas fa-star"></i>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(1)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="contact-card">
+                                <!-- Contact Card 2 - Michael Johnson (User) -->
+                                <div class="contact-card" data-contact-id="2">
                                     <div class="contact-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
@@ -148,19 +208,20 @@
                                         <p class="contact-status away">Away</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn" title="View Profile">
+                                        <button class="contact-btn">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn" title="Send Message">
+                                        <button class="contact-btn">
                                             <i class="fas fa-envelope"></i>
                                         </button>
-                                        <button class="contact-btn favorite-btn" title="Add to Favorites">
-                                            <i class="far fa-star"></i>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(2)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="contact-card">
+                                <!-- Contact Card 3 - Sarah Wilson (Manager) -->
+                                <div class="contact-card" data-contact-id="3">
                                     <div class="contact-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
@@ -170,14 +231,83 @@
                                         <p class="contact-status offline">Offline</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn" title="View Profile">
+                                        <button class="contact-btn">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn" title="Send Message">
+                                        <button class="contact-btn">
                                             <i class="fas fa-envelope"></i>
                                         </button>
-                                        <button class="contact-btn favorite-btn" title="Add to Favorites">
-                                            <i class="far fa-star"></i>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(3)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Card 4 - Alex Thompson (User) -->
+                                <div class="contact-card" data-contact-id="4">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>Alex Thompson</h4>
+                                        <p class="contact-role">User</p>
+                                        <p class="contact-status online">Online</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(4)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Card 5 - Emma Rodriguez (Manager) -->
+                                <div class="contact-card" data-contact-id="5">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>Emma Rodriguez</h4>
+                                        <p class="contact-role">Manager</p>
+                                        <p class="contact-status away">Away</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(5)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Card 6 - David Chen (User) -->
+                                <div class="contact-card" data-contact-id="6">
+                                    <div class="contact-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="contact-info">
+                                        <h4>David Chen</h4>
+                                        <p class="contact-role">User</p>
+                                        <p class="contact-status offline">Offline</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="contact-btn">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn delete-btn" onclick="removeContact(6)" title="Delete Contact">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -188,43 +318,40 @@
                         <div class="contacts-recent">
                             <h3><i class="fas fa-clock"></i> Recently Viewed</h3>
                             <div class="recent-contacts-list" id="recentContactsList">
+                                <!-- Recent Contact 1 -->
                                 <div class="recent-contact-item">
                                     <div class="recent-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
                                     <div class="recent-info">
-                                        <span class="recent-name">Alex Thompson</span>
+                                        <h5>Jessica Park</h5>
+                                        <p class="recent-role">Moderator</p>
+                                        <span class="recent-time">30 minutes ago</span>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Contact 2 -->
+                                <div class="recent-contact-item">
+                                    <div class="recent-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="recent-info">
+                                        <h5>Lynn Davis</h5>
+                                        <p class="recent-role">Administrator</p>
                                         <span class="recent-time">2 hours ago</span>
                                     </div>
-                                    <button class="quick-view-btn" title="Quick View">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
                                 </div>
 
+                                <!-- Recent Contact 3 -->
                                 <div class="recent-contact-item">
                                     <div class="recent-avatar">
                                         <i class="fas fa-user-circle"></i>
                                     </div>
                                     <div class="recent-info">
-                                        <span class="recent-name">Emma Rodriguez</span>
-                                        <span class="recent-time">Yesterday</span>
+                                        <h5>Michael Johnson</h5>
+                                        <p class="recent-role">User</p>
+                                        <span class="recent-time">1 hour ago</span>
                                     </div>
-                                    <button class="quick-view-btn" title="Quick View">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
-                                </div>
-
-                                <div class="recent-contact-item">
-                                    <div class="recent-avatar">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                    <div class="recent-info">
-                                        <span class="recent-name">David Chen</span>
-                                        <span class="recent-time">3 days ago</span>
-                                    </div>
-                                    <button class="quick-view-btn" title="Quick View">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -278,150 +405,6 @@
                         </div>
                     </div>
                 </section>
-
-                <section class="search-section">
-                    <div class="search-header">
-                        <h2><i class="fas fa-search"></i> Contact Search</h2>
-                        <p>Search through your added contacts</p>
-                    </div>
-
-                    <div class="search-container">
-                        <div class="search-box">
-                            <label for="userSearchInput" class="sr-only">Search for contacts</label>
-                            <input type="text" id="userSearchInput"
-                                placeholder="Search your contacts by name, email, or role..."
-                                aria-describedby="search-help">
-                            <button id="searchUserBtn" class="search-btn" aria-describedby="search-help">
-                                <i class="fas fa-search" aria-hidden="true"></i>
-                                Search
-                            </button>
-                            <div class="filter-dropdown-container">
-                                <button id="filterDropdownBtn" class="filter-btn" onclick="toggleFilterDropdown()" aria-label="Filter Options">
-                                    <i class="fas fa-filter"></i>
-                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
-                                </button>
-                                <div id="filterDropdown" class="filter-dropdown" style="display: none;">
-                                    <div class="dropdown-header">
-                                        <h4><i class="fas fa-filter"></i> Filter Contacts</h4>
-                                    </div>
-                                    <div class="dropdown-content">
-                                        <div class="filter-group">
-                                            <label for="roleFilter">Filter by Role:</label>
-                                            <select id="roleFilter" aria-label="Filter contacts by role">
-                                                <option value="">All Roles</option>
-                                                <option value="Administrator">Administrator</option>
-                                                <option value="User">User</option>
-                                                <option value="Manager">Manager</option>
-                                                <option value="Moderator">Moderator</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="statusFilter">Filter by Status:</label>
-                                            <select id="statusFilter" aria-label="Filter contacts by status">
-                                                <option value="">All Status</option>
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                                <option value="Away">Away</option>
-                                                <option value="Offline">Offline</option>
-                                            </select>
-                                        </div>
-                                        <div class="filter-actions">
-                                            <button id="applyFiltersBtn" class="apply-filters-btn" onclick="applyFilters()">
-                                                <i class="fas fa-check"></i> Apply Filters
-                                            </button>
-                                            <button id="clearFiltersBtn" class="clear-filters-btn" onclick="clearFilters()">
-                                                <i class="fas fa-times"></i> Clear All
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Hidden search filters for backward compatibility -->
-                        <div class="search-filters" style="display: none;">
-                            <select id="roleFilterHidden" aria-label="Filter contacts by role">
-                                <option value="">All Roles</option>
-                            </select>
-                            <select id="statusFilterHidden" aria-label="Filter contacts by status">
-                                <option value="">All Status</option>
-                            </select>
-                        </div>
-
-                        <div class="advanced-search" id="advancedSearch" style="display: none;">
-                            <div class="filter-row">
-                                <div class="filter-group">
-                                    <label>Registration:</label>
-                                    <select id="filterRegistration">
-                                        <option value="">Any Time</option>
-                                        <option value="today">Today</option>
-                                        <option value="week">This Week</option>
-                                        <option value="month">This Month</option>
-                                        <option value="year">This Year</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label>Sort By:</label>
-                                    <select id="sortBy">
-                                        <option value="name">Name</option>
-                                        <option value="date">Registration Date</option>
-                                        <option value="activity">Last Activity</option>
-                                        <option value="role">Role</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label>Order:</label>
-                                    <select id="sortOrder">
-                                        <option value="asc">Ascending</option>
-                                        <option value="desc">Descending</option>
-                                    </select>
-                                </div>
-                                <div class="filter-actions">
-                                    <button class="filter-action-btn primary" onclick="applyFilters()">
-                                        <i class="fas fa-check"></i> Apply
-                                    </button>
-                                    <button class="filter-action-btn secondary" onclick="clearFilters()">
-                                        <i class="fas fa-times"></i> Clear
-                                    </button>
-                                    <button class="filter-action-btn info" onclick="saveSearch()">
-                                        <i class="fas fa-star"></i> Save
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="saved-searches" id="savedSearches">
-                                <label>Saved Searches:</label>
-                                <div class="saved-search-tags" id="savedSearchTags">
-                                    <span class="search-tag" onclick="loadSavedSearch('admins')">
-                                        <i class="fas fa-user-shield"></i> Admin Users
-                                        <button class="remove-tag"
-                                            onclick="removeSavedSearch('admins')">&times;</button>
-                                    </span>
-                                    <span class="search-tag" onclick="loadSavedSearch('recent')">
-                                        <i class="fas fa-clock"></i> Recent Users
-                                        <button class="remove-tag"
-                                            onclick="removeSavedSearch('recent')">&times;</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="searchResults" class="search-results" role="region" aria-live="polite"
-                        aria-label="Search results">
-                        <div class="no-results">
-                            <i class="fas fa-users" aria-hidden="true"></i>
-                            <p>Enter a search term to find your contacts</p>
-                            <small>Only your added contacts will appear in search results</small>
-                        </div>
-                    </div>
-
-                    <!-- Loading state -->
-                    <div id="searchLoading" class="search-loading" style="display: none;">
-                        <div class="loading-spinner"></div>
-                        <p>Searching...</p>
-                    </div>
-                </section>
-
                 <section class="stats-section">
                     <h3><i class="fas fa-chart-bar"></i> Database Statistics</h3>
                     <div class="stats-grid">
