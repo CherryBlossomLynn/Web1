@@ -403,8 +403,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update all displays that show contacts
         updateAllContactDisplays: function() {
-            updateContactsDisplay();
-            updateContactSearchResults();
+            if (typeof window.updateContactsDisplay === 'function') {
+                window.updateContactsDisplay();
+            }
+            if (typeof window.updateContactSearchResults === 'function') {
+                window.updateContactSearchResults();
+            }
         }
     };
 
@@ -700,6 +704,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Initialize contacts display
         updateContactsDisplay();
+        
+        // Make functions available globally
+        window.updateContactsDisplay = updateContactsDisplay;
+        window.updateRecentContacts = updateRecentContacts;
     }
 
     // Add new contact - Navigate to add contact page (Simple working version)
@@ -1239,6 +1247,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Load user settings on page load
         loadUserSettings();
+        
+        // Make function available globally
+        window.updateContactSearchResults = updateContactSearchResults;
     }
 
     function showCustomizationTabs() {
