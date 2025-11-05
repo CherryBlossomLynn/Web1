@@ -3621,15 +3621,16 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 });
 
-// Define contacts globally to ensure access
+// Define contacts globally to ensure access - Updated with Contact Manager Database
 window.globalContacts = [
+    // Keep Lynn as requested
     { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
-    { id: 2, name: 'Michael Johnson', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 3600000, email: 'michael@lynnsdatabase.local', phone: '+1 (555) 234-5678', birthday: '1992-03-15', bio: 'Software Developer focused on full-stack web development. Passionate about creating user-friendly applications and improving system efficiency.' },
-    { id: 3, name: 'Sarah Wilson', role: 'Manager', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: 'sarah@lynnsdatabase.local', phone: '+1 (555) 345-6789', birthday: '1985-07-22', bio: 'Project Manager with expertise in Agile methodologies. Leads cross-functional teams to deliver high-quality software solutions on time and within budget.' },
-    { id: 4, name: 'Alex Thompson', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'alex@lynnsdatabase.local', phone: '+1 (555) 456-7890', birthday: '1994-12-08', bio: 'Frontend Developer specializing in React and modern JavaScript frameworks. Enjoys creating responsive and accessible user interfaces.' },
-    { id: 5, name: 'Emma Rodriguez', role: 'Manager', status: 'away', favorite: false, lastViewed: Date.now() - 86400000, email: 'emma@lynnsdatabase.local', phone: '+1 (555) 567-8901', birthday: '1987-09-30', bio: 'Operations Manager responsible for streamlining business processes and ensuring optimal team productivity. Expert in process automation and workflow optimization.' },
-    { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local', phone: '+1 (555) 678-9012', birthday: '1991-05-18', bio: 'Backend Developer with strong expertise in Node.js and Python. Focuses on building scalable APIs and microservices architecture.' },
-    { id: 7, name: 'Jessica Park', role: 'Moderator', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'jessica@lynnsdatabase.local', phone: '+1 (555) 789-0123', birthday: '1990-01-25', bio: 'Community Moderator and UX Designer. Ensures positive user experiences while maintaining community guidelines and creating intuitive design solutions.' }
+    // Your real contacts from Contact Manager database
+    { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
+    { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
+    { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
+    { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
+    { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
 ];
 
 // Global view contact profile function (outside DOMContentLoaded for onclick access)
