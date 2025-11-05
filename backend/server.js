@@ -208,6 +208,58 @@ app.get('/api/users/search', async (req, res) => {
     }
 });
 
+// Get contacts from Contact_Manager database
+app.get('/api/contacts', async (req, res) => {
+    try {
+        const contacts = await dbOperations.getContactManagerContacts();
+        res.json({
+            success: true,
+            contacts: contacts
+        });
+    } catch (error) {
+        console.error('Get contacts error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Get games and gametypes for interests
+app.get('/api/interests', async (req, res) => {
+    try {
+        const interests = await dbOperations.getGamesAndGameTypes();
+        res.json({
+            success: true,
+            interests: interests
+        });
+    } catch (error) {
+        console.error('Get interests error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Get contact interests by ID
+app.get('/api/contacts/:id/interests', async (req, res) => {
+    try {
+        const contactId = parseInt(req.params.id);
+        const interests = await dbOperations.getContactInterests(contactId);
+        res.json({
+            success: true,
+            interests: interests
+        });
+    } catch (error) {
+        console.error('Get contact interests error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({

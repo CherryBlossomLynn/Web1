@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Separated Games Tables Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            color: white;
+            border-radius: 12px;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .section {
+            margin: 25px 0;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 0 12px 12px 0;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+        .category-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-top: 4px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .videogames-card { border-top-color: #00d4aa; }
+        .physicalgames-card { border-top-color: #ff6b6b; }
+        .media-card { border-top-color: #feca57; }
+        .game-item {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+        .game-item:hover {
+            transform: scale(1.05);
+        }
+        .videogames-item { background: linear-gradient(45deg, #00d4aa, #00b894); color: white; }
+        .physicalgames-item { background: linear-gradient(45deg, #ff6b6b, #e55656); color: white; }
+        .media-item { background: linear-gradient(45deg, #feca57, #fdcb6e); color: white; }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .success { 
+            background: linear-gradient(45deg, #00b894, #00d4aa); 
+            color: white; 
+            border: none;
+        }
+        .error { 
+            background: linear-gradient(45deg, #e55656, #ff6b6b); 
+            color: white; 
+            border: none;
+        }
+        .info { 
+            background: linear-gradient(45deg, #74b9ff, #0984e3); 
+            color: white; 
+            border: none;
+        }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Separated Games Tables Structure</h1>
+            <p>Testing individual tables: videogames, physicalgames, media</p>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Connection Status</h2>
+            <div id="apiStatus" class="status info">
+                <span class="loading"></span> Testing API connection...
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Games by Separated Tables</h2>
+            <button onclick="loadSeparatedGames()">🎮 Load All Games</button>
+            <button onclick="testDirectTables()">🔍 Test Direct Table Access</button>
+            <div id="separatedGames"></div>
+        </div>
+
+        <div class="section">
+            <h2>👥 Contact Games Testing</h2>
+            <button onclick="loadContactGames()">👤 Load Contact Games</button>
+            <div id="contactGames"></div>
+        </div>
+    </div>
+
+    <script>
+        let apiBaseUrl = 'http://localhost:3000/api';
+        
+        // Test API connection
+        async function testAPI() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('apiStatus').innerHTML = `
+                        <div class="success">✅ API Connected Successfully</div>
+                        <p>Server timestamp: ${data.timestamp}</p>
+                    `;
+                } else {
+                    throw new Error('API health check failed');
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = `
+                    <div class="error">❌ API Connection Failed: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Load games from separated tables structure
+        async function loadSeparatedGames() {
+            try {
+                document.getElementById('separatedGames').innerHTML = '<div class="loading"></div> Loading separated games structure...';
+                
+                const response = await fetch(`${apiBaseUrl}/interests`);
+                const data = await response.json();
+                
+                if (data.success && data.interests) {
+                    displaySeparatedStructure(data.interests);
+                } else {
+                    throw new Error('Failed to load games data');
+                }
+            } catch (error) {
+                document.getElementById('separatedGames').innerHTML = `
+                    <div class="error">❌ Failed to load games: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Display separated games structure
+        function displaySeparatedStructure(data) {
+            let html = '';
+            
+            // Statistics row
+            const categorized = data.categorizedInterests || {};
+            const videogamesCount = categorized.videogames ? categorized.videogames.length : 0;
+            const physicalGamesCount = categorized.physicalGames ? categorized.physicalGames.length : 0;
+            const mediaCount = categorized.media ? categorized.media.length : 0;
+            const totalCount = videogamesCount + physicalGamesCount + mediaCount;
+            
+            html += `
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-number">${videogamesCount}</span>
+                        Video Games
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">${physicalGamesCount}</span>
+                        Physical Games
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">${mediaCount}</span>
+                        Media Items
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">${totalCount}</span>
+                        Total Items
+                    </div>
+                </div>
+            `;
+            
+            // Games grid
+            html += '<div class="games-grid">';
+            
+            // Video Games
+            if (categorized.videogames && categorized.videogames.length > 0) {
+                html += `
+                    <div class="category-card videogames-card">
+                        <h3>🎮 Video Games</h3>
+                        <p><strong>${categorized.videogames.length}</strong> games in videogames table</p>
+                        <div>
+                            ${categorized.videogames.map(game => 
+                                `<span class="game-item videogames-item">${game}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Physical Games
+            if (categorized.physicalGames && categorized.physicalGames.length > 0) {
+                html += `
+                    <div class="category-card physicalgames-card">
+                        <h3>🏐 Physical Games</h3>
+                        <p><strong>${categorized.physicalGames.length}</strong> games in physicalgames table</p>
+                        <div>
+                            ${categorized.physicalGames.map(game => 
+                                `<span class="game-item physicalgames-item">${game}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Media
+            if (categorized.media && categorized.media.length > 0) {
+                html += `
+                    <div class="category-card media-card">
+                        <h3>📺 Media</h3>
+                        <p><strong>${categorized.media.length}</strong> items in media table</p>
+                        <div>
+                            ${categorized.media.map(item => 
+                                `<span class="game-item media-item">${item}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            
+            // API structure info
+            html += `
+                <div class="info">
+                    <h4>🔍 API Structure Analysis:</h4>
+                    <p><strong>Response Type:</strong> ${typeof data}</p>
+                    <p><strong>Has categorizedInterests:</strong> ${!!data.categorizedInterests}</p>
+                    <p><strong>Has games array:</strong> ${Array.isArray(data.games)}</p>
+                    <p><strong>Categories:</strong> ${data.categories ? data.categories.join(', ') : 'N/A'}</p>
+                    <p><strong>Structure:</strong> Separated Tables (videogames, physicalgames, media)</p>
+                </div>
+            `;
+            
+            document.getElementById('separatedGames').innerHTML = html;
+        }
+
+        // Test direct table access (theoretical - would need backend endpoints)
+        async function testDirectTables() {
+            let html = '<h3>🔍 Direct Table Structure Analysis:</h3>';
+            
+            html += `
+                <div class="info">
+                    <h4>Expected Table Structure:</h4>
+                    <p><strong>videogames table:</strong> Contains only video games like Minecraft, VR Games, etc.</p>
+                    <p><strong>physicalgames table:</strong> Contains physical games like Uno, Monopoly, Chess, etc.</p>
+                    <p><strong>media table:</strong> Contains movies, TV shows, documentaries, etc.</p>
+                    <p><strong>Current API:</strong> Aggregates all tables into unified response</p>
+                </div>
+            `;
+            
+            // Show what we got from the API
+            try {
+                const response = await fetch(`${apiBaseUrl}/interests`);
+                const data = await response.json();
+                
+                html += `
+                    <div class="success">
+                        <h4>✅ API Response Analysis:</h4>
+                        <pre style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; overflow-x: auto;">
+${JSON.stringify(data, null, 2)}
+                        </pre>
+                    </div>
+                `;
+            } catch (error) {
+                html += `
+                    <div class="error">
+                        <h4>❌ API Test Failed:</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('separatedGames').innerHTML = html;
+        }
+
+        // Load contact games
+        async function loadContactGames() {
+            try {
+                document.getElementById('contactGames').innerHTML = '<div class="loading"></div> Loading contact games...';
+                
+                const contactsResponse = await fetch(`${apiBaseUrl}/contacts`);
+                const contactsData = await contactsResponse.json();
+                
+                if (!contactsData.success) {
+                    throw new Error('Failed to load contacts');
+                }
+                
+                let html = '<h3>👥 Contact Games from Separated Tables:</h3>';
+                
+                for (const contact of contactsData.contacts.slice(0, 3)) { // Test first 3 contacts
+                    try {
+                        const gamesResponse = await fetch(`${apiBaseUrl}/contacts/${contact.ID}/interests`);
+                        const gamesData = await gamesResponse.json();
+                        
+                        html += `
+                            <div class="category-card">
+                                <h4>${contact.Name}</h4>
+                                <p><strong>Email:</strong> ${contact.email || 'N/A'}</p>
+                        `;
+                        
+                        if (gamesData.success && gamesData.interests) {
+                            const interests = gamesData.interests;
+                            
+                            if (interests.videogames && interests.videogames.length > 0) {
+                                html += `
+                                    <p><strong>Video Games:</strong></p>
+                                    <div>${interests.videogames.map(game => 
+                                        `<span class="game-item videogames-item">${game}</span>`
+                                    ).join('')}</div>
+                                `;
+                            }
+                            
+                            if (interests.physicalGames && interests.physicalGames.length > 0) {
+                                html += `
+                                    <p><strong>Physical Games:</strong></p>
+                                    <div>${interests.physicalGames.map(game => 
+                                        `<span class="game-item physicalgames-item">${game}</span>`
+                                    ).join('')}</div>
+                                `;
+                            }
+                            
+                            if (interests.media && interests.media.length > 0) {
+                                html += `
+                                    <p><strong>Media:</strong></p>
+                                    <div>${interests.media.map(item => 
+                                        `<span class="game-item media-item">${item}</span>`
+                                    ).join('')}</div>
+                                `;
+                            }
+                        } else {
+                            html += '<p><em>No games found in separated tables</em></p>';
+                        }
+                        
+                        html += '</div>';
+                    } catch (error) {
+                        html += `
+                            <div class="category-card">
+                                <h4>${contact.Name}</h4>
+                                <div class="error">Error: ${error.message}</div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                document.getElementById('contactGames').innerHTML = html;
+                
+            } catch (error) {
+                document.getElementById('contactGames').innerHTML = `
+                    <div class="error">❌ Failed to load contact games: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            testAPI();
+        });
+    </script>
+</body>
+</html>

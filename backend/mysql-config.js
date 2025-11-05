@@ -8,11 +8,9 @@ const dbConfig = {
     host: 'localhost',
     user: 'root',  // XAMPP default user
     password: '',  // XAMPP default password (empty)
-    database: 'Contact_Manager',  // Your existing database
-    port: 3306,
-    connectionLimit: 10,
-    acquireTimeout: 60000,
-    timeout: 60000
+    database: 'contact_manager',  // Your existing database (lowercase)
+    port: 3307,  // XAMPP uses port 3307
+    connectionLimit: 10
 };
 
 // Create connection pool
@@ -276,6 +274,247 @@ const dbOperations = {
                 [userId, action, details, ipAddress, userAgent]
             );
             connection.release();
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    // Contact Manager Database Operations
+    getContactManagerContacts: async () => {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT ID, Name, Phone_Number as phone, Email as email, BirthDate as birthday FROM contacts ORDER BY Name'
+            );
+            connection.release();
+            return rows;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    // Get games from separated category tables structure
+    getGamesAndGameTypes: async () => {
+        const connection = await pool.getConnection();
+        try {
+            const categorizedInterests = {
+                videogames: [],
+                physicalGames: [],
+                media: []
+            };
+
+            const allGames = [];
+            const categories = ['videogames', 'physicalGames', 'media'];
+
+            // Get videogames
+            try {
+                const [videogames] = await connection.execute(`
+                    SELECT name, description FROM videogames WHERE is_active = TRUE ORDER BY name
+                `);
+                videogames.forEach(game => {
+                    categorizedInterests.videogames.push(game.name);
+                    allGames.push({
+                        name: game.name,
+                        category: 'videogames',
+                        description: game.description,
+                        gameType: 'VideoGame'
+                    });
+                });
+            } catch (e) {
+                console.log('Videogames table not accessible:', e.message);
+            }
+
+            // Get physical games
+            try {
+                const [physicalGames] = await connection.execute(`
+                    SELECT name, description, game_type FROM physicalgames WHERE is_active = TRUE ORDER BY name
+                `);
+                physicalGames.forEach(game => {
+                    categorizedInterests.physicalGames.push(game.name);
+                    allGames.push({
+                        name: game.name,
+                        category: 'physicalGames',
+                        description: game.description,
+                        gameType: game.game_type || 'PhysicalGame'
+                    });
+                });
+            } catch (e) {
+                console.log('Physical games table not accessible:', e.message);
+            }
+
+            // Get media
+            try {
+                const [media] = await connection.execute(`
+                    SELECT name, description, media_type FROM media WHERE is_active = TRUE ORDER BY name
+                `);
+                media.forEach(item => {
+                    categorizedInterests.media.push(item.name);
+                    allGames.push({
+                        name: item.name,
+                        category: 'media',
+                        description: item.description,
+                        gameType: item.media_type || 'Media'
+                    });
+                });
+            } catch (e) {
+                console.log('Media table not accessible:', e.message);
+            }
+
+            connection.release();
+            return {
+                games: allGames,
+                categories: categories,
+                categorizedInterests: categorizedInterests,
+                // API compatibility 
+                interests: { categorizedInterests, games: allGames, categories },
+                gameTypes: categories
+            };
+        } catch (error) {
+            connection.release();
+            // Fallback to old structure if new tables don't exist
+            console.log('Separated tables not found, falling back to legacy structure');
+            return await this.getLegacyGamesAndGameTypes();
+        }
+    },
+
+    // Legacy fallback method
+    getLegacyGamesAndGameTypes: async () => {
+        const connection = await pool.getConnection();
+        try {
+            // Try to get from the old column-based tables if they exist
+            const categorizedInterests = {
+                videogames: [],
+                physicalGames: [],
+                media: []
+            };
+
+            try {
+                const [gameTypeColumns] = await connection.execute('SHOW COLUMNS FROM gametypes WHERE Field != "ID"');
+                const gameTypes = gameTypeColumns.map(col => col.Field);
+                categorizedInterests.videogames = gameTypes.filter(gt => gt.includes('Video') || gt.includes('VR'));
+                categorizedInterests.physicalGames = gameTypes.filter(gt => gt.includes('Card') || gt.includes('Board'));
+            } catch (e) {
+                console.log('Legacy gametypes table not accessible');
+            }
+
+            try {
+                const [gameColumns] = await connection.execute('SHOW COLUMNS FROM games WHERE Field != "ID"');
+                const games = gameColumns.map(col => col.Field);
+                // Distribute games to categories based on names
+                games.forEach(game => {
+                    if (game.toLowerCase().includes('minecraft') || game.toLowerCase().includes('vr')) {
+                        categorizedInterests.videogames.push(game);
+                    } else {
+                        categorizedInterests.physicalGames.push(game);
+                    }
+                });
+            } catch (e) {
+                console.log('Legacy games table not accessible');
+            }
+
+            // Add some default data if nothing found
+            if (categorizedInterests.videogames.length === 0 && 
+                categorizedInterests.physicalGames.length === 0 && 
+                categorizedInterests.media.length === 0) {
+                
+                categorizedInterests.videogames = ['Minecraft', 'VR Games', 'Action Games'];
+                categorizedInterests.physicalGames = ['Uno', 'Monopoly', 'Chess'];
+                categorizedInterests.media = ['Action Movies', 'Tech Documentaries'];
+            }
+
+            connection.release();
+            return {
+                games: Object.values(categorizedInterests).flat(),
+                gameTypes: ['videogames', 'physicalGames', 'media'],
+                categorizedInterests: categorizedInterests,
+                interests: { categorizedInterests }
+            };
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    // Get specific contact interests from separated table structure
+    getContactInterests: async (contactId) => {
+        const connection = await pool.getConnection();
+        try {
+            const interests = {
+                videogames: [],
+                physicalGames: [],
+                media: []
+            };
+
+            // Get contact interests from the interest system (preferred method)
+            try {
+                const [rows] = await connection.execute(`
+                    SELECT 
+                        ic.name as category,
+                        i.name as interest_name
+                    FROM contacts c
+                    JOIN contact_interests ci ON c.ID = ci.contact_id
+                    JOIN interests i ON ci.interest_id = i.id
+                    JOIN interest_categories ic ON i.category_id = ic.id
+                    WHERE c.ID = ?
+                    ORDER BY ic.name, i.name
+                `, [contactId]);
+
+                if (rows.length > 0) {
+                    rows.forEach(row => {
+                        if (interests[row.category]) {
+                            interests[row.category].push(row.interest_name);
+                        }
+                    });
+                    connection.release();
+                    return interests;
+                }
+            } catch (e) {
+                console.log('Interest tables not accessible, trying separated tables:', e.message);
+            }
+
+            // Fallback: try to get from separated tables by looking up games
+            // This would require contact relationship tables that we haven't fully implemented yet
+            
+            connection.release();
+            // Try legacy method if no results
+            return await this.getLegacyContactInterests(contactId);
+        } catch (error) {
+            connection.release();
+            console.log('Contact interests structure not available, using legacy method');
+            return await this.getLegacyContactInterests(contactId);
+        }
+    },
+
+    // Legacy contact interests method
+    getLegacyContactInterests: async (contactId) => {
+        const connection = await pool.getConnection();
+        try {
+            const [gameTypeRows] = await connection.execute(
+                'SELECT VideoGame, CardGame, VirtualReality, BoardGame FROM gametypes WHERE ID = ?',
+                [contactId]
+            );
+            
+            if (gameTypeRows.length === 0) {
+                connection.release();
+                return null;
+            }
+
+            const gameTypes = gameTypeRows[0];
+            const interests = {
+                videogames: [],
+                physicalGames: [],
+                media: []
+            };
+
+            if (gameTypes.VideoGame) interests.videogames.push('Minecraft', 'Action Games');
+            if (gameTypes.VirtualReality) interests.videogames.push('VR Games', 'Virtual Reality');
+            if (gameTypes.CardGame) interests.physicalGames.push('Uno', 'Card Games');
+            if (gameTypes.BoardGame) interests.physicalGames.push('Monopoly', 'Board Games');
+
+            connection.release();
+            return interests;
         } catch (error) {
             connection.release();
             throw error;

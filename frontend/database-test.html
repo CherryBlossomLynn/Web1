@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Interests Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .loading { background-color: #fff3cd; border-color: #ffeaa7; }
+        pre { background-color: #f8f9fa; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🗄️ Database-Driven Interests System Test</h1>
+    
+    <div class="test-section loading" id="server-status">
+        <h3>📡 Server Status</h3>
+        <p>Checking backend server connection...</p>
+        <div id="server-result"></div>
+    </div>
+
+    <div class="test-section loading" id="interests-test">
+        <h3>🎮 Interests from Database</h3>
+        <p>Loading interests structure from Contact_Manager database...</p>
+        <div id="interests-result"></div>
+    </div>
+
+    <div class="test-section loading" id="contacts-test">
+        <h3>👥 Contacts from Database</h3>
+        <p>Loading contacts from Contact_Manager database...</p>
+        <div id="contacts-result"></div>
+    </div>
+
+    <div class="test-section" id="contact-interests-test">
+        <h3>🎯 Individual Contact Interests</h3>
+        <p>Test interests for specific contacts:</p>
+        <button onclick="testContactInterests(1)">Lynn (ID: 1)</button>
+        <button onclick="testContactInterests(2)">Kathy (ID: 2)</button>
+        <button onclick="testContactInterests(3)">Michael (ID: 3)</button>
+        <button onclick="testContactInterests(4)">Nathan (ID: 4)</button>
+        <button onclick="testContactInterests(5)">Willie (ID: 5)</button>
+        <div id="contact-interests-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Test server connection
+        async function testServer() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                const section = document.getElementById('server-status');
+                const result = document.getElementById('server-result');
+                
+                if (data.success) {
+                    section.className = 'test-section success';
+                    result.innerHTML = `
+                        <p>✅ Server is healthy!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error('Server returned error');
+                }
+            } catch (error) {
+                const section = document.getElementById('server-status');
+                const result = document.getElementById('server-result');
+                section.className = 'test-section error';
+                result.innerHTML = `
+                    <p>❌ Server connection failed</p>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure the backend server is running on port 3000</p>
+                `;
+            }
+        }
+
+        // Test interests API
+        async function testInterests() {
+            try {
+                const response = await fetch(`${API_BASE}/interests`);
+                const data = await response.json();
+                
+                const section = document.getElementById('interests-test');
+                const result = document.getElementById('interests-result');
+                
+                if (data.success) {
+                    section.className = 'test-section success';
+                    result.innerHTML = `
+                        <p>✅ Interests loaded from database!</p>
+                        <h4>Available Games:</h4>
+                        <p>${data.interests.games?.join(', ') || 'No games found'}</p>
+                        <h4>Game Types:</h4>
+                        <p>${data.interests.gameTypes?.join(', ') || 'No game types found'}</p>
+                        <h4>Categorized Interests:</h4>
+                        <pre>${JSON.stringify(data.interests.categorizedInterests, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            } catch (error) {
+                const section = document.getElementById('interests-test');
+                const result = document.getElementById('interests-result');
+                section.className = 'test-section error';
+                result.innerHTML = `
+                    <p>❌ Failed to load interests</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Test contacts API
+        async function testContacts() {
+            try {
+                const response = await fetch(`${API_BASE}/contacts`);
+                const data = await response.json();
+                
+                const section = document.getElementById('contacts-test');
+                const result = document.getElementById('contacts-result');
+                
+                if (data.success) {
+                    section.className = 'test-section success';
+                    result.innerHTML = `
+                        <p>✅ Contacts loaded from database!</p>
+                        <p>Found ${data.contacts.length} contacts</p>
+                        <pre>${JSON.stringify(data.contacts, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            } catch (error) {
+                const section = document.getElementById('contacts-test');
+                const result = document.getElementById('contacts-result');
+                section.className = 'test-section error';
+                result.innerHTML = `
+                    <p>❌ Failed to load contacts</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Test individual contact interests
+        async function testContactInterests(contactId) {
+            try {
+                const response = await fetch(`${API_BASE}/contacts/${contactId}/interests`);
+                const data = await response.json();
+                
+                const result = document.getElementById('contact-interests-result');
+                
+                if (data.success) {
+                    result.innerHTML += `
+                        <div style="border: 1px solid #28a745; background-color: #d4edda; padding: 10px; margin: 5px 0;">
+                            <h4>✅ Contact ID ${contactId} Interests:</h4>
+                            <pre>${JSON.stringify(data.interests, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML += `
+                        <div style="border: 1px solid #dc3545; background-color: #f8d7da; padding: 10px; margin: 5px 0;">
+                            <h4>❌ Contact ID ${contactId} - No interests found</h4>
+                            <p>Error: ${data.message || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                const result = document.getElementById('contact-interests-result');
+                result.innerHTML += `
+                    <div style="border: 1px solid #dc3545; background-color: #f8d7da; padding: 10px; margin: 5px 0;">
+                        <h4>❌ Contact ID ${contactId} - Request failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Run all tests on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await testServer();
+            await testInterests();
+            await testContacts();
+        });
+    </script>
+</body>
+</html>

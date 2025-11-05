@@ -36,7 +36,15 @@ window.forceRefreshContacts = function() {
     }
 };
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    // Initialize database-driven interests system first
+    console.log('🚀 Starting application initialization...');
+    
+    // Try to initialize database interests
+    if (window.initializeDatabaseInterests) {
+        await window.initializeDatabaseInterests();
+    }
+    
     // Login System
     const loginForm = document.getElementById('loginForm');
     const loginSection = document.getElementById('loginSection');
@@ -3655,17 +3663,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 });
 
-// Define contacts globally to ensure access - Updated with Contact Manager Database
-window.globalContacts = [
-    // Keep Lynn as requested
-    { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
-    // Your real contacts from Contact Manager database
-    { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
-    { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
-    { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
-    { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
-    { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
-];
+// Note: globalContacts is already defined at the top of the file with interests data
 
 // Global view contact profile function (outside DOMContentLoaded for onclick access)
 window.viewContactProfile = function(contactId) {
