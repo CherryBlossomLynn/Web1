@@ -71,14 +71,14 @@
     <div id="contacts"></div>
 
     <script>
-        // Your exact contacts - hardcoded here for testing
+        // Your exact contacts - hardcoded here for testing with interests
         const YOUR_CONTACTS = [
-            { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04' },
-            { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, email: '', phone: '', birthday: '' },
-            { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, email: '', phone: '4694266925', birthday: '' },
-            { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07' },
-            { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29' },
-            { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16' }
+            { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', interests: { videogames: ['Database Management Games'], physicalGames: ['Chess', 'Strategy Board Games'], media: ['Tech Documentaries', 'Cybersecurity Films'] } },
+            { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, email: '', phone: '', birthday: '', interests: { videogames: ['Casual Mobile Games'], physicalGames: ['Uno', 'Hopscotch', 'Jump Rope'], media: ['Romance Movies', 'Comedy Films', 'TV Dramas'] } },
+            { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, email: '', phone: '4694266925', birthday: '', interests: { videogames: ['Minecraft', 'Action Games', 'RPGs'], physicalGames: ['Monopoly', 'Card Games', 'Basketball'], media: ['Action Movies', 'Gaming Streams', 'Adventure Films'] } },
+            { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', interests: { videogames: ['VR Games', 'Virtual Reality', 'Tech Simulators'], physicalGames: ['Tech Gadgets', 'Puzzle Games'], media: ['Sci-Fi Movies', 'Tech Reviews', 'Gaming Content'] } },
+            { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', interests: { videogames: ['Classic Arcade Games'], physicalGames: ['Uno', 'Checkers', 'Traditional Games'], media: ['Classic Movies', 'Old TV Shows', 'Documentaries'] } },
+            { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', interests: { videogames: ['Minecraft', 'Mobile Games', 'Creative Games'], physicalGames: ['Tag', 'Board Games', 'Sports'], media: ['Teen Movies', 'Music Videos', 'Social Media Content'] } }
         ];
 
         function log(msg) {
@@ -101,6 +101,11 @@
                         <p><strong>Phone:</strong> ${contact.phone || 'Not provided'}</p>
                         <p><strong>Birthday:</strong> ${contact.birthday || 'Not provided'}</p>
                         <p><strong>Favorite:</strong> ${contact.favorite ? '⭐ Yes' : 'No'}</p>
+                        ${contact.interests ? `
+                            <p><strong>Video Games:</strong> ${contact.interests.videogames?.join(', ') || 'None'}</p>
+                            <p><strong>Physical Games:</strong> ${contact.interests.physicalGames?.join(', ') || 'None'}</p>
+                            <p><strong>Media:</strong> ${contact.interests.media?.join(', ') || 'None'}</p>
+                        ` : '<p><strong>Interests:</strong> Not provided</p>'}
                     </div>
                 `;
                 container.appendChild(div);
