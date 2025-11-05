@@ -1,0 +1,241 @@
+/* Contact Details with Borders - Fixed */
+.contact-details-inline {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.contact-detail-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    justify-content: space-between;
+}
+
+.contact-detail-inline:hover {
+    border-color: var(--accent-color);
+    background: rgba(102, 126, 234, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.contact-detail-inline i {
+    color: var(--accent-color);
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.detail-text {
+    color: var(--text-primary);
+    font-weight: 500;
+    flex: 1;
+}
+
+.edit-icon {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    margin-left: auto;
+    padding: 0.3rem;
+    border-radius: 4px;
+}
+
+.edit-icon:hover {
+    color: var(--accent-color);
+    opacity: 1;
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.1);
+}
+
+.edit-icon:active {
+    transform: scale(0.95);
+    background: rgba(102, 126, 234, 0.2);
+}
+
+/* Visual feedback for editable fields */
+.contact-detail-inline:hover .edit-icon {
+    opacity: 0.8;
+}
+
+/* Success animation for updated fields */
+@keyframes updateSuccess {
+    0% { background: rgba(40, 167, 69, 0.2); }
+    100% { background: rgba(255, 255, 255, 0.05); }
+}
+
+.contact-detail-inline.updated {
+    animation: updateSuccess 1s ease-out;
+}
+
+/* Bio Section with Blue Border - Fixed */
+.contact-bio-inline {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-color);
+}
+
+.contact-detail-inline.bio-detail {
+    align-items: flex-start !important;
+    min-height: 60px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 0.8rem 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.contact-detail-inline.bio-detail:hover {
+    border-color: var(--accent-color) !important;
+    background: rgba(102, 126, 234, 0.08) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
+}
+
+.bio-detail .bio-text {
+    line-height: 1.6 !important;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-width: calc(100% - 60px);
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Special styling for bio when it's long */
+.bio-detail .detail-text {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.bio-detail .edit-icon {
+    align-self: flex-start;
+    margin-top: 0.2rem;
+}
+
+.bio-label-text {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 20px;
+    text-align: center;
+    min-width: 35px;
+    flex-shrink: 0;
+}
+
+/* Interests Section with Border Styling */
+.contact-interests-inline {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-color);
+}
+
+.contact-detail-inline.interests-detail {
+    align-items: flex-start !important;
+    min-height: 80px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 0.8rem 1rem !important;
+    transition: all 0.3s ease !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+}
+
+.interests-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.interests-header i {
+    color: var(--accent-color);
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.interests-label-text {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.contact-detail-inline.interests-detail:hover {
+    border-color: var(--accent-color) !important;
+    background: rgba(102, 126, 234, 0.08) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
+}
+
+.interests-detail .interests-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.interests-detail .interest-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.interests-detail .interest-category label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.interests-detail .interest-dropdown {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.interests-detail .interest-dropdown:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.interests-detail .interest-dropdown:hover {
+    border-color: var(--accent-color);
+}
+
+/* Responsive adjustments for interests */
+@media (max-width: 768px) {
+    .interests-detail .interests-container {
+        gap: 0.6rem;
+    }
+    
+    .interests-detail .interest-dropdown {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+}

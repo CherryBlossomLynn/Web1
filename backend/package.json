@@ -5,8 +5,11 @@
   "main": "lynn-website.html",
   "scripts": {
     "start": "node server.js",
+    "api": "node api-server.js",
     "dev": "nodemon server.js",
+    "dev-api": "nodemon api-server.js",
     "setup-db": "node mysql-config.js",
+    "migrate-db": "mysql -u root -p Contact_Manager < ../database/migrate-contact-manager.sql",
     "import-xampp": "node import-xampp-users.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

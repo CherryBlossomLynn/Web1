@@ -255,6 +255,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     }
 
+    function initializeFilterDropdown() {
+        console.log('🔧 Initializing filter dropdown');
+        
+        // Add event listeners for dropdown buttons
+        const applyBtn = document.getElementById('applyFiltersBtn');
+        const clearBtn = document.getElementById('clearFiltersBtn');
+        const filterBtn = document.getElementById('filterDropdownBtn');
+        
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Apply filters button clicked');
+                if (typeof window.applyFilters === 'function') {
+                    window.applyFilters();
+                }
+            });
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Clear filters button clicked');
+                if (typeof window.clearFilters === 'function') {
+                    window.clearFilters();
+                }
+            });
+        }
+        
+        if (filterBtn) {
+            filterBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Filter dropdown button clicked');
+                if (typeof window.toggleFilterDropdown === 'function') {
+                    window.toggleFilterDropdown();
+                }
+            });
+        }
+        
+        console.log('Filter dropdown initialized with buttons:', {
+            applyBtn: !!applyBtn,
+            clearBtn: !!clearBtn,
+            filterBtn: !!filterBtn
+        });
+    }
+
     function initializeMainPage() {
         // Initialize page navigation
         initializePageNavigation();
@@ -264,6 +309,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Initialize contacts functionality
         initializeContacts();
+
+        // Initialize filter dropdown functionality
+        initializeFilterDropdown();
 
         // Force contact display update after a short delay to ensure DOM is ready
         setTimeout(function() {
@@ -340,16 +388,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Global Contacts Management System
+    // Global Contacts Management System - Updated with Contact Manager Database
     let globalContacts = [
-        { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local' },
-        { id: 2, name: 'Michael Johnson', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 3600000, email: 'michael@lynnsdatabase.local' },
-        { id: 3, name: 'Sarah Wilson', role: 'Manager', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: 'sarah@lynnsdatabase.local' },
-        { id: 4, name: 'Alex Thompson', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'alex@lynnsdatabase.local' },
-        { id: 5, name: 'Emma Rodriguez', role: 'Manager', status: 'away', favorite: false, lastViewed: Date.now() - 86400000, email: 'emma@lynnsdatabase.local' },
-        { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local' },
-        { id: 7, name: 'Jessica Park', role: 'Moderator', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'jessica@lynnsdatabase.local' }
+        // Keep Lynn as requested
+        { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
+        // Your real contacts from Contact Manager database
+        { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
+        { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
+        { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
+        { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
+        { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
     ];
+
+    // Make globalContacts accessible from global scope
+    window.globalContacts = globalContacts;
 
     // Global Contacts Manager
     window.ContactsManager = {
@@ -371,7 +423,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 favorite: false,
                 lastViewed: Date.now(),
                 email: user.email,
-                department: user.department || 'Unknown'
+                phone: user.phone || 'No phone available',
+                birthday: user.birthday || null,
+                department: user.department || 'Unknown',
+                bio: user.bio || 'No bio available'
             };
 
             globalContacts.push(newContact);
@@ -400,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Get contact by ID
         getContact: function(contactId) {
-            return globalContacts.find(c => c.id === contactId);
+            return globalContacts.find(c => c.id == contactId);
         },
 
         // Update contact's favorite status
@@ -477,9 +532,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="recent-name">${contact.name}</span>
                         <span class="recent-time">${timeAgo(contact.lastViewed)}</span>
                     </div>
-                    <button class="quick-view-btn" title="Quick View" onclick="viewContactProfile(${contact.id})">
-                        <i class="fas fa-external-link-alt"></i>
-                    </button>
                 </div>
             `).join('');
         }
@@ -524,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <p class="contact-status ${contact.status}">${contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}</p>
                     </div>
                     <div class="contact-actions">
-                        <button class="contact-btn" title="View Profile" onclick="viewContactProfile(${contact.id})">
+                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(${contact.id})">
                             <i class="fas fa-eye"></i>
                         </button>
                         <button class="contact-btn" title="Send Message" onclick="sendMessage(${contact.id})">
@@ -549,15 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Functions will be made available globally at the end of initializeContacts
         console.log("🚀 Contact display functions defined");
 
-        // View contact profile
-        window.viewContactProfile = function(contactId) {
-            const contact = ContactsManager.getContact(contactId);
-            if (contact) {
-                ContactsManager.updateLastViewed(contactId);
-                showNotification(`Viewing ${contact.name}'s profile`);
-                // Here you would typically navigate to the profile page
-            }
-        };
+
 
         // Send message
         window.sendMessage = function(contactId) {
@@ -1169,9 +1213,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         <p><strong>Last Seen:</strong> ${user.lastSeen}</p>
                     </div>
                     <div class="contact-actions">
-                        <button class="contact-action-btn view-btn" onclick="viewContactProfile(${user.id})" title="View Profile">
-                            <i class="fas fa-eye"></i>
-                        </button>
                         <button class="contact-action-btn message-btn" onclick="sendMessage(${user.id})" title="Send Message">
                             <i class="fas fa-envelope"></i>
                         </button>
@@ -1221,14 +1262,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Global functions for contact search actions (avoid duplicate definitions)
         if (typeof window.viewContactProfile === 'undefined') {
-            window.viewContactProfile = function(contactId) {
-                const contact = ContactsManager.getContact(contactId);
-                if (contact) {
-                    ContactsManager.updateLastViewed(contactId);
-                    showNotification(`Viewing ${contact.name}'s profile`);
-                    // Here you would typically navigate to the profile page
-                }
-            };
+            // viewContactProfile is already defined globally above
+        } else {
+            // Function already exists, no need to redefine
 
             window.sendMessage = function(contactId) {
                 const contact = ContactsManager.getContact(contactId);
@@ -2824,22 +2860,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Filter Dropdown Functionality
     window.toggleFilterDropdown = function() {
+        console.log('🔽 toggleFilterDropdown called');
+        
         const dropdown = document.getElementById('filterDropdown');
         const button = document.getElementById('filterDropdownBtn');
         const container = document.querySelector('.filter-dropdown-container');
         
-        const isVisible = dropdown.style.display !== 'none';
+        console.log('Elements found:', {
+            dropdown: !!dropdown,
+            button: !!button,
+            container: !!container
+        });
+        
+        if (!dropdown || !button || !container) {
+            console.error('Missing dropdown elements!');
+            return;
+        }
+        
+        const isVisible = dropdown.style.display === 'block';
+        console.log('Current visibility:', isVisible);
         
         if (isVisible) {
             // Hide dropdown
             dropdown.style.display = 'none';
             button.classList.remove('active');
             container.classList.remove('show');
+            console.log('🔼 Dropdown hidden');
         } else {
             // Show dropdown
             dropdown.style.display = 'block';
             button.classList.add('active');
             container.classList.add('show');
+            console.log('🔽 Dropdown shown');
         }
     };
 
@@ -3561,13 +3613,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    window.viewContactProfile = function(contactId) {
-        const contact = globalContacts.find(c => c.id === contactId);
-        if (contact) {
-            showNotification(`Viewing ${contact.name}'s profile`);
-        }
-    };
-
     window.sendMessage = function(contactId) {
         const contact = globalContacts.find(c => c.id === contactId);
         if (contact) {
@@ -3575,3 +3620,999 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 });
+
+// Define contacts globally to ensure access
+window.globalContacts = [
+    { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
+    { id: 2, name: 'Michael Johnson', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 3600000, email: 'michael@lynnsdatabase.local', phone: '+1 (555) 234-5678', birthday: '1992-03-15', bio: 'Software Developer focused on full-stack web development. Passionate about creating user-friendly applications and improving system efficiency.' },
+    { id: 3, name: 'Sarah Wilson', role: 'Manager', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: 'sarah@lynnsdatabase.local', phone: '+1 (555) 345-6789', birthday: '1985-07-22', bio: 'Project Manager with expertise in Agile methodologies. Leads cross-functional teams to deliver high-quality software solutions on time and within budget.' },
+    { id: 4, name: 'Alex Thompson', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'alex@lynnsdatabase.local', phone: '+1 (555) 456-7890', birthday: '1994-12-08', bio: 'Frontend Developer specializing in React and modern JavaScript frameworks. Enjoys creating responsive and accessible user interfaces.' },
+    { id: 5, name: 'Emma Rodriguez', role: 'Manager', status: 'away', favorite: false, lastViewed: Date.now() - 86400000, email: 'emma@lynnsdatabase.local', phone: '+1 (555) 567-8901', birthday: '1987-09-30', bio: 'Operations Manager responsible for streamlining business processes and ensuring optimal team productivity. Expert in process automation and workflow optimization.' },
+    { id: 6, name: 'David Chen', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 259200000, email: 'david@lynnsdatabase.local', phone: '+1 (555) 678-9012', birthday: '1991-05-18', bio: 'Backend Developer with strong expertise in Node.js and Python. Focuses on building scalable APIs and microservices architecture.' },
+    { id: 7, name: 'Jessica Park', role: 'Moderator', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'jessica@lynnsdatabase.local', phone: '+1 (555) 789-0123', birthday: '1990-01-25', bio: 'Community Moderator and UX Designer. Ensures positive user experiences while maintaining community guidelines and creating intuitive design solutions.' }
+];
+
+// Global view contact profile function (outside DOMContentLoaded for onclick access)
+window.viewContactProfile = function(contactId) {
+    console.log('🔍 viewContactProfile called with ID:', contactId);
+    
+    // Convert contactId to number if it's a string
+    const numericId = parseInt(contactId);
+    
+    // Find the contact
+    const contact = window.globalContacts.find(c => c.id == contactId || c.id == numericId);
+    console.log('📋 Found contact:', contact);
+    
+    if (contact) {
+        // Update last viewed timestamp using ContactsManager if available
+        if (window.ContactsManager && window.ContactsManager.updateLastViewed) {
+            window.ContactsManager.updateLastViewed(contactId);
+        }
+        
+        // Store current contact ID for action buttons
+        window.currentContactId = contactId;
+        
+        // Populate contact details
+        const nameEl = document.getElementById('contactDetailsName');
+        const roleEl = document.getElementById('contactDetailsRole');
+        const emailEl = document.getElementById('contactDetailsEmail');
+        const phoneEl = document.getElementById('contactDetailsPhone');
+        const birthdayEl = document.getElementById('contactDetailsBirthday');
+        const bioEl = document.getElementById('contactDetailsBio');
+        const statusEl = document.getElementById('contactDetailsStatus');
+        
+        if (nameEl) nameEl.textContent = contact.name;
+        if (roleEl) roleEl.textContent = contact.role;
+        if (emailEl) emailEl.textContent = contact.email;
+        if (phoneEl) phoneEl.textContent = contact.phone || 'No phone number available';
+        if (birthdayEl) {
+            // Format birthday nicely
+            if (contact.birthday) {
+                const date = new Date(contact.birthday);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                birthdayEl.textContent = date.toLocaleDateString('en-US', options);
+            } else {
+                birthdayEl.textContent = 'No birthday available';
+            }
+        }
+        if (bioEl) bioEl.textContent = contact.bio || 'No bio available';
+        
+        // Setup edit functionality for contact details
+        setupContactDetailEditing(contact.id);
+        
+        // Populate interests dropdowns
+        const videogamesDropdown = document.getElementById('videogamesDropdown');
+        const physicalGamesDropdown = document.getElementById('physicalGamesDropdown');
+        const mediaDropdown = document.getElementById('mediaDropdown');
+        
+        if (contact.interests) {
+            // Populate video games dropdown
+            if (videogamesDropdown && contact.interests.videogames) {
+                videogamesDropdown.innerHTML = '<option value="">Select video game interest</option>';
+                contact.interests.videogames.forEach(game => {
+                    const option = document.createElement('option');
+                    option.value = game;
+                    option.textContent = game;
+                    videogamesDropdown.appendChild(option);
+                });
+            }
+            
+            // Populate physical games dropdown
+            if (physicalGamesDropdown && contact.interests.physicalGames) {
+                physicalGamesDropdown.innerHTML = '<option value="">Select physical game interest</option>';
+                contact.interests.physicalGames.forEach(game => {
+                    const option = document.createElement('option');
+                    option.value = game;
+                    option.textContent = game;
+                    physicalGamesDropdown.appendChild(option);
+                });
+            }
+            
+            // Populate media dropdown
+            if (mediaDropdown && contact.interests.media) {
+                mediaDropdown.innerHTML = '<option value="">Select media interest</option>';
+                contact.interests.media.forEach(mediaItem => {
+                    const option = document.createElement('option');
+                    option.value = mediaItem;
+                    option.textContent = mediaItem;
+                    mediaDropdown.appendChild(option);
+                });
+            }
+        }
+        
+        // Update status indicator
+        if (statusEl) {
+            statusEl.textContent = contact.status;
+            statusEl.className = `status-indicator ${contact.status.toLowerCase()}`;
+        }
+        
+        // Update favorite button
+        const favoriteIcon = document.getElementById('detailsFavoriteIcon');
+        const favoriteText = document.getElementById('detailsFavoriteText');
+        if (favoriteIcon && favoriteText) {
+            if (contact.favorite) {
+                favoriteIcon.className = 'fas fa-star';
+                favoriteText.textContent = 'Remove from Favorites';
+            } else {
+                favoriteIcon.className = 'far fa-star';
+                favoriteText.textContent = 'Add to Favorites';
+            }
+        }
+        
+        // Hide main page and show contact details page
+        console.log('🔄 Switching to contact details page');
+        const mainPage = document.getElementById('mainPage');
+        const detailsPage = document.getElementById('contactDetailsPage');
+        console.log('📄 Main page element:', mainPage);
+        console.log('📄 Details page element:', detailsPage);
+        
+        if (mainPage) mainPage.style.display = 'none';
+        if (detailsPage) detailsPage.style.display = 'block';
+        
+        if (window.showNotification) {
+            window.showNotification(`Viewing ${contact.name}'s profile`);
+        }
+    } else {
+        console.error('Contact not found for ID:', contactId);
+        alert('Contact not found for ID: ' + contactId);
+        if (window.showNotification) {
+            window.showNotification('Contact not found!', 'error');
+        }
+    }
+};
+
+// Contact Detail Editing Functionality
+function setupContactDetailEditing(contactId) {
+    // Setup edit icons click handlers
+    const editIcons = document.querySelectorAll('.edit-icon');
+    editIcons.forEach(icon => {
+        // Remove existing listeners to avoid duplicates
+        icon.replaceWith(icon.cloneNode(true));
+    });
+    
+    // Re-select icons after cloning
+    const freshEditIcons = document.querySelectorAll('.edit-icon');
+    freshEditIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const title = icon.getAttribute('title');
+            if (title.includes('Email')) {
+                editContactEmail(contactId);
+            } else if (title.includes('Phone')) {
+                editContactPhone(contactId);
+            } else if (title.includes('Birthday')) {
+                editContactBirthday(contactId);
+            } else if (title.includes('Bio')) {
+                editContactBio(contactId);
+            }
+        });
+    });
+}
+
+function editContactEmail(contactId) {
+    const contact = window.globalContacts.find(c => c.id == contactId);
+    if (!contact) return;
+    
+    const currentEmail = contact.email;
+    
+    // Create a modal for email editing
+    const modal = createEmailEditModal(currentEmail, (newEmail) => {
+        if (newEmail === null) return; // User cancelled
+        
+        if (validateEmail(newEmail)) {
+            // Update the contact data
+            contact.email = newEmail;
+            
+            // Update the display
+            const emailEl = document.getElementById('contactDetailsEmail');
+            if (emailEl) {
+                emailEl.textContent = newEmail;
+                // Add visual feedback
+                const container = emailEl.closest('.contact-detail-inline');
+                if (container) {
+                    container.classList.add('updated');
+                    setTimeout(() => container.classList.remove('updated'), 1000);
+                }
+            }
+            
+            // Show success notification
+            if (window.showNotification) {
+                window.showNotification(`Email updated to ${newEmail}`, 'success');
+            }
+            
+            // Save to localStorage for persistence
+            saveContactUpdates();
+        } else {
+            alert('Please enter a valid email address (e.g., user@example.com)');
+        }
+    });
+}
+
+function editContactPhone(contactId) {
+    const contact = window.globalContacts.find(c => c.id == contactId);
+    if (!contact) return;
+    
+    const currentPhone = contact.phone;
+    
+    // Create a modal for phone editing
+    const modal = createPhoneEditModal(currentPhone, (newPhone) => {
+        if (newPhone === null) return; // User cancelled
+        
+        if (validatePhone(newPhone)) {
+            // Format the phone number
+            const formattedPhone = formatPhoneNumber(newPhone);
+            
+            // Update the contact data
+            contact.phone = formattedPhone;
+            
+            // Update the display
+            const phoneEl = document.getElementById('contactDetailsPhone');
+            if (phoneEl) {
+                phoneEl.textContent = formattedPhone;
+                // Add visual feedback
+                const container = phoneEl.closest('.contact-detail-inline');
+                if (container) {
+                    container.classList.add('updated');
+                    setTimeout(() => container.classList.remove('updated'), 1000);
+                }
+            }
+            
+            // Show success notification
+            if (window.showNotification) {
+                window.showNotification(`Phone updated to ${formattedPhone}`, 'success');
+            }
+            
+            // Save to localStorage for persistence
+            saveContactUpdates();
+        } else {
+            alert('Please enter a valid phone number with 10-11 digits (e.g., +1 555 123 4567 or 555-123-4567)');
+        }
+    });
+}
+
+function editContactBirthday(contactId) {
+    const contact = window.globalContacts.find(c => c.id == contactId);
+    if (!contact) return;
+    
+    // Convert current birthday to MM/DD/YYYY format for display
+    let currentBirthday = '';
+    if (contact.birthday) {
+        const date = new Date(contact.birthday);
+        currentBirthday = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+    }
+    
+    // Create a modal for birthday editing
+    const modal = createBirthdayEditModal(currentBirthday, (newBirthday) => {
+        if (newBirthday === null) return; // User cancelled
+        
+        if (validateBirthday(newBirthday)) {
+            // Convert to ISO format for storage
+            const [month, day, year] = newBirthday.split('/');
+            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            
+            // Update the contact data
+            contact.birthday = isoDate;
+            
+            // Update the display with formatted date
+            const birthdayEl = document.getElementById('contactDetailsBirthday');
+            if (birthdayEl) {
+                const date = new Date(isoDate);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                birthdayEl.textContent = date.toLocaleDateString('en-US', options);
+                // Add visual feedback
+                const container = birthdayEl.closest('.contact-detail-inline');
+                if (container) {
+                    container.classList.add('updated');
+                    setTimeout(() => container.classList.remove('updated'), 1000);
+                }
+            }
+            
+            // Show success notification
+            if (window.showNotification) {
+                window.showNotification(`Birthday updated to ${newBirthday}`, 'success');
+            }
+            
+            // Save to localStorage for persistence
+            saveContactUpdates();
+        } else {
+            alert('Please enter a valid date in MM/DD/YYYY format (e.g., 12/25/1990)');
+        }
+    });
+}
+
+function editContactBio(contactId) {
+    const contact = window.globalContacts.find(c => c.id == contactId);
+    if (!contact) return;
+    
+    const currentBio = contact.bio || '';
+    
+    // Create a modal for better bio editing experience
+    const modal = createBioEditModal(currentBio, (newBio) => {
+        if (newBio === null) return; // User cancelled
+        
+        if (validateBio(newBio)) {
+            // Update the contact data
+            contact.bio = newBio;
+            
+            // Update the display
+            const bioEl = document.getElementById('contactDetailsBio');
+            if (bioEl) {
+                bioEl.textContent = newBio || 'No bio available';
+                // Add visual feedback
+                const container = bioEl.closest('.contact-detail-inline');
+                if (container) {
+                    container.classList.add('updated');
+                    setTimeout(() => container.classList.remove('updated'), 1000);
+                }
+            }
+            
+            // Show success notification
+            if (window.showNotification) {
+                window.showNotification('Bio updated successfully', 'success');
+            }
+            
+            // Save to localStorage for persistence
+            saveContactUpdates();
+        } else {
+            alert('Bio must be between 1 and 500 characters long');
+        }
+    });
+}
+
+function createBioEditModal(currentBio, onSave) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'bio-edit-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    // Create modal content
+    const modal = document.createElement('div');
+    modal.className = 'bio-edit-modal';
+    modal.style.cssText = `
+        background: var(--bg-primary);
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    // Create modal header
+    const header = document.createElement('h3');
+    header.textContent = 'Edit Bio';
+    header.style.cssText = `
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    `;
+    header.textContent = 'Edit Bio';
+    
+    // Create textarea
+    const textarea = document.createElement('textarea');
+    textarea.value = currentBio;
+    textarea.placeholder = 'Enter bio information...';
+    textarea.style.cssText = `
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        line-height: 1.6;
+        resize: vertical;
+        font-family: inherit;
+        margin-bottom: 1rem;
+    `;
+    
+    // Character counter
+    const counter = document.createElement('div');
+    counter.style.cssText = `
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        text-align: right;
+    `;
+    
+    function updateCounter() {
+        const length = textarea.value.length;
+        counter.textContent = `${length}/500 characters`;
+        if (length > 500) {
+            counter.style.color = '#e74c3c';
+        } else {
+            counter.style.color = 'var(--text-secondary)';
+        }
+    }
+    
+    textarea.addEventListener('input', updateCounter);
+    updateCounter();
+    
+    // Create buttons container
+    const buttons = document.createElement('div');
+    buttons.style.cssText = `
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    `;
+    
+    // Create save button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save';
+    saveBtn.style.cssText = `
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Add event listeners
+    saveBtn.addEventListener('click', () => {
+        onSave(textarea.value.trim());
+        document.body.removeChild(overlay);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        onSave(null);
+        document.body.removeChild(overlay);
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            onSave(null);
+            document.body.removeChild(overlay);
+        }
+    });
+    
+    // Assemble modal
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(saveBtn);
+    modal.appendChild(header);
+    modal.appendChild(textarea);
+    modal.appendChild(counter);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Focus textarea
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    
+    return overlay;
+}
+
+function createEmailEditModal(currentEmail, onSave) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'email-edit-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    // Create modal content
+    const modal = document.createElement('div');
+    modal.className = 'email-edit-modal';
+    modal.style.cssText = `
+        background: var(--bg-primary);
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    // Create modal header
+    const header = document.createElement('h3');
+    header.textContent = 'Edit Email Address';
+    header.style.cssText = `
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    `;
+    
+    // Create input field
+    const input = document.createElement('input');
+    input.type = 'email';
+    input.value = currentEmail;
+    input.placeholder = 'Enter email address...';
+    input.style.cssText = `
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: inherit;
+        margin-bottom: 1rem;
+    `;
+    
+    // Create buttons container
+    const buttons = document.createElement('div');
+    buttons.style.cssText = `
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    `;
+    
+    // Create save button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save';
+    saveBtn.style.cssText = `
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Add event listeners
+    saveBtn.addEventListener('click', () => {
+        onSave(input.value.trim());
+        document.body.removeChild(overlay);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        onSave(null);
+        document.body.removeChild(overlay);
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            onSave(null);
+            document.body.removeChild(overlay);
+        }
+    });
+    
+    // Assemble modal
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(saveBtn);
+    modal.appendChild(header);
+    modal.appendChild(input);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Focus input
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+    
+    return overlay;
+}
+
+function createPhoneEditModal(currentPhone, onSave) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'phone-edit-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    // Create modal content
+    const modal = document.createElement('div');
+    modal.className = 'phone-edit-modal';
+    modal.style.cssText = `
+        background: var(--bg-primary);
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    // Create modal header
+    const header = document.createElement('h3');
+    header.textContent = 'Edit Phone Number';
+    header.style.cssText = `
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    `;
+    
+    // Create input field
+    const input = document.createElement('input');
+    input.type = 'tel';
+    input.value = currentPhone;
+    input.placeholder = 'Enter phone number (e.g., +1 555 123 4567)';
+    input.style.cssText = `
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: inherit;
+        margin-bottom: 0.5rem;
+    `;
+    
+    // Create help text
+    const helpText = document.createElement('div');
+    helpText.textContent = 'Format: 10-11 digits (e.g., +1 555 123 4567 or 555-123-4567)';
+    helpText.style.cssText = `
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    `;
+    
+    // Create buttons container
+    const buttons = document.createElement('div');
+    buttons.style.cssText = `
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    `;
+    
+    // Create save button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save';
+    saveBtn.style.cssText = `
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Add event listeners
+    saveBtn.addEventListener('click', () => {
+        onSave(input.value.trim());
+        document.body.removeChild(overlay);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        onSave(null);
+        document.body.removeChild(overlay);
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            onSave(null);
+            document.body.removeChild(overlay);
+        }
+    });
+    
+    // Assemble modal
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(saveBtn);
+    modal.appendChild(header);
+    modal.appendChild(input);
+    modal.appendChild(helpText);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Focus input
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+    
+    return overlay;
+}
+
+function createBirthdayEditModal(currentBirthday, onSave) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'birthday-edit-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    // Create modal content
+    const modal = document.createElement('div');
+    modal.className = 'birthday-edit-modal';
+    modal.style.cssText = `
+        background: var(--bg-primary);
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    // Create modal header
+    const header = document.createElement('h3');
+    header.textContent = 'Edit Birthday';
+    header.style.cssText = `
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    `;
+    
+    // Create input field
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentBirthday;
+    input.placeholder = 'MM/DD/YYYY (e.g., 12/25/1990)';
+    input.style.cssText = `
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: inherit;
+        margin-bottom: 0.5rem;
+    `;
+    
+    // Create help text
+    const helpText = document.createElement('div');
+    helpText.textContent = 'Format: MM/DD/YYYY (e.g., 12/25/1990)';
+    helpText.style.cssText = `
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    `;
+    
+    // Create buttons container
+    const buttons = document.createElement('div');
+    buttons.style.cssText = `
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    `;
+    
+    // Create save button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save';
+    saveBtn.style.cssText = `
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Create cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    
+    // Add event listeners
+    saveBtn.addEventListener('click', () => {
+        onSave(input.value.trim());
+        document.body.removeChild(overlay);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        onSave(null);
+        document.body.removeChild(overlay);
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            onSave(null);
+            document.body.removeChild(overlay);
+        }
+    });
+    
+    // Assemble modal
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(saveBtn);
+    modal.appendChild(header);
+    modal.appendChild(input);
+    modal.appendChild(helpText);
+    modal.appendChild(buttons);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Focus input
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+    
+    return overlay;
+}
+
+// Validation Functions
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+}
+
+function validatePhone(phone) {
+    // Remove all non-digit characters to count digits
+    const digitsOnly = phone.replace(/\D/g, '');
+    // Allow 10 digits (US) or 11 digits (with country code)
+    return digitsOnly.length >= 10 && digitsOnly.length <= 11;
+}
+
+function validateBirthday(birthday) {
+    // Check MM/DD/YYYY format
+    const dateRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/;
+    if (!dateRegex.test(birthday)) return false;
+    
+    // Check if it's a valid date
+    const [month, day, year] = birthday.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    // Verify the date components match (handles invalid dates like 02/30/2020)
+    return date.getFullYear() === year && 
+           date.getMonth() === month - 1 && 
+           date.getDate() === day &&
+           year >= 1900 && year <= new Date().getFullYear();
+}
+
+function validateBio(bio) {
+    // Bio can be empty or between 1-500 characters
+    return bio.length <= 500;
+}
+
+function formatPhoneNumber(phone) {
+    // Remove all non-digit characters
+    const digitsOnly = phone.replace(/\D/g, '');
+    
+    if (digitsOnly.length === 10) {
+        // Format as (555) 123-4567
+        return `+1 (${digitsOnly.substring(0, 3)}) ${digitsOnly.substring(3, 6)}-${digitsOnly.substring(6)}`;
+    } else if (digitsOnly.length === 11 && digitsOnly.startsWith('1')) {
+        // Format as +1 (555) 123-4567
+        return `+1 (${digitsOnly.substring(1, 4)}) ${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7)}`;
+    } else {
+        // Return original if it doesn't match expected patterns
+        return phone;
+    }
+}
+
+function saveContactUpdates() {
+    // Save updated contacts to localStorage for persistence
+    localStorage.setItem('globalContacts', JSON.stringify(window.globalContacts));
+    console.log('💾 Contact updates saved to localStorage');
+}
+
+// Load saved contact updates on page load
+function loadContactUpdates() {
+    const savedContacts = localStorage.getItem('globalContacts');
+    if (savedContacts) {
+        try {
+            const parsedContacts = JSON.parse(savedContacts);
+            // Merge with existing contacts, keeping any new properties
+            parsedContacts.forEach(savedContact => {
+                const existingContact = window.globalContacts.find(c => c.id === savedContact.id);
+                if (existingContact) {
+                    // Update existing contact with saved data
+                    Object.assign(existingContact, savedContact);
+                }
+            });
+            console.log('📂 Loaded saved contact updates from localStorage');
+        } catch (error) {
+            console.error('Error loading saved contacts:', error);
+        }
+    }
+}
+
+// Load saved contacts when the page loads
+window.addEventListener('load', loadContactUpdates);
+

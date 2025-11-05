@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lynn's Database</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/contact-borders.css">
     <link rel="preload" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
@@ -119,47 +120,6 @@
                                         <button id="searchUserBtn" class="search-btn" aria-describedby="search-help">
                                             <i class="fas fa-search" aria-hidden="true"></i>
                                         </button>
-                                        <div class="filter-dropdown-container">
-                                            <button id="filterDropdownBtn" class="filter-btn" onclick="toggleFilterDropdown()" aria-label="Filter Options">
-                                                <i class="fas fa-filter"></i>
-                                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                                            </button>
-                                            <div id="filterDropdown" class="filter-dropdown" style="display: none;">
-                                                <div class="dropdown-header">
-                                                    <h4><i class="fas fa-filter"></i> Filter Contacts</h4>
-                                                </div>
-                                                <div class="dropdown-content">
-                                                    <div class="filter-group">
-                                                        <label for="roleFilter">Filter by Role:</label>
-                                                        <select id="roleFilter" aria-label="Filter contacts by role">
-                                                            <option value="">All Roles</option>
-                                                            <option value="Administrator">Administrator</option>
-                                                            <option value="User">User</option>
-                                                            <option value="Manager">Manager</option>
-                                                            <option value="Moderator">Moderator</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="filter-group">
-                                                        <label for="statusFilter">Filter by Status:</label>
-                                                        <select id="statusFilter" aria-label="Filter contacts by status">
-                                                            <option value="">All Status</option>
-                                                            <option value="Active">Active</option>
-                                                            <option value="Inactive">Inactive</option>
-                                                            <option value="Away">Away</option>
-                                                            <option value="Offline">Offline</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="filter-actions">
-                                                        <button id="applyFiltersBtn" class="apply-btn">
-                                                            <i class="fas fa-check"></i> Apply Filters
-                                                        </button>
-                                                        <button id="clearFiltersBtn" class="clear-btn">
-                                                            <i class="fas fa-times"></i> Clear
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <button id="addContactBtn" class="add-contact-btn" onclick="document.getElementById('mainPage').style.display='none'; document.getElementById('addContactPage').style.display='block';">
@@ -172,7 +132,7 @@
                     <div class="contacts-container">
                         <!-- Favorites Section -->
                         <div class="contacts-favorites">
-                            <h3><i class="fas fa-star"></i> Favorites</h3>
+                            <h3></h3>
                             <div class="contacts-grid" id="favoritesGrid">
                                 <!-- Contact Card 1 - Lynn Davis (Administrator) -->
                                 <div class="contact-card" data-contact-id="1">
@@ -185,10 +145,10 @@
                                         <p class="contact-status online">Online</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(1)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(1)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(1)" title="Delete Contact">
@@ -208,10 +168,10 @@
                                         <p class="contact-status away">Away</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(2)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(2)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(2)" title="Delete Contact">
@@ -231,10 +191,10 @@
                                         <p class="contact-status offline">Offline</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(3)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(3)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(3)" title="Delete Contact">
@@ -254,10 +214,10 @@
                                         <p class="contact-status online">Online</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(4)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(4)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(4)" title="Delete Contact">
@@ -277,10 +237,10 @@
                                         <p class="contact-status away">Away</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(5)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(5)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(5)" title="Delete Contact">
@@ -300,10 +260,10 @@
                                         <p class="contact-status offline">Offline</p>
                                     </div>
                                     <div class="contact-actions">
-                                        <button class="contact-btn">
+                                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(6)">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="contact-btn">
+                                        <button class="contact-btn" title="Send Message" onclick="sendMessage(6)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(6)" title="Delete Contact">
@@ -1326,6 +1286,100 @@
                 </section>
             </div>
 
+            <!-- Contact Details Page -->
+            <div id="contactDetailsPage" class="page-content" style="display: none;">
+                <section class="contact-details-section">
+                    <div class="contact-details-header">
+                        <button id="backToMainFromDetails" class="back-btn" onclick="document.getElementById('contactDetailsPage').style.display='none'; document.getElementById('mainPage').style.display='block';">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Contacts
+                        </button>
+                        <h2><i class="fas fa-user"></i> Contact Details</h2>
+                    </div>
+
+                    <div class="contact-details-content">
+                        <div class="contact-profile-card">
+                            <div class="contact-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="contact-info">
+                                <h3 id="contactDetailsName" class="contact-name"></h3>
+                                <span id="contactDetailsRole" class="contact-role"></span>
+                                <div class="contact-status">
+                                    <span id="contactDetailsStatus" class="status-indicator"></span>
+                                </div>
+                                <div class="contact-details-inline">
+                                    <div class="contact-detail-inline">
+                                        <i class="fas fa-envelope"></i>
+                                        <span id="contactDetailsEmail" class="detail-text"></span>
+                                        <i class="fas fa-pencil-alt edit-icon" title="Edit Email"></i>
+                                    </div>
+                                    <div class="contact-detail-inline">
+                                        <i class="fas fa-phone"></i>
+                                        <span id="contactDetailsPhone" class="detail-text"></span>
+                                        <i class="fas fa-pencil-alt edit-icon" title="Edit Phone"></i>
+                                    </div>
+                                    <div class="contact-detail-inline">
+                                        <i class="fas fa-birthday-cake"></i>
+                                        <span id="contactDetailsBirthday" class="detail-text"></span>
+                                        <i class="fas fa-pencil-alt edit-icon" title="Edit Birthday"></i>
+                                    </div>
+                                </div>
+                                <div class="contact-bio-inline">
+                                    <div class="contact-detail-inline bio-detail">
+                                        <span class="bio-label-text">Bio</span>
+                                        <span id="contactDetailsBio" class="detail-text bio-text"></span>
+                                        <i class="fas fa-pencil-alt edit-icon" title="Edit Bio"></i>
+                                    </div>
+                                </div>
+                                <div class="contact-interests-inline">
+                                    <div class="contact-detail-inline interests-detail">
+                                        <div class="interests-header">
+                                            <i class="fas fa-heart"></i>
+                                            <span class="interests-label-text">Interests</span>
+                                        </div>
+                                        <div class="interests-container">
+                                            <div class="interest-category">
+                                                <label for="videogamesDropdown">Video Games:</label>
+                                                <select id="videogamesDropdown" class="interest-dropdown">
+                                                    <option value="">Select video game interest</option>
+                                                </select>
+                                            </div>
+                                            <div class="interest-category">
+                                                <label for="physicalGamesDropdown">Physical Games:</label>
+                                                <select id="physicalGamesDropdown" class="interest-dropdown">
+                                                    <option value="">Select physical game interest</option>
+                                                </select>
+                                            </div>
+                                            <div class="interest-category">
+                                                <label for="mediaDropdown">Media:</label>
+                                                <select id="mediaDropdown" class="interest-dropdown">
+                                                    <option value="">Select media interest</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-details-grid">
+                        </div>
+
+                        <div class="contact-actions">
+                            <button class="action-btn primary" onclick="sendMessage(window.currentContactId)">
+                                <i class="fas fa-paper-plane"></i>
+                                Send Message
+                            </button>
+                            <button class="action-btn secondary" onclick="toggleFavorite(window.currentContactId)">
+                                <i class="fas fa-star" id="detailsFavoriteIcon"></i>
+                                <span id="detailsFavoriteText">Add to Favorites</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
             <footer>
                 <p><i class="fas fa-code"></i> Built with HTML5, CSS3 & JavaScript</p>
                 <p><small>Modern database interface with interactive features</small></p>
@@ -1339,6 +1393,7 @@
     </div>
 
     <script src="../js/script.js"></script>
+    <script src="../js/your-contacts.js"></script>
 </body>
 
 </html>

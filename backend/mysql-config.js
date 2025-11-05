@@ -6,9 +6,9 @@ const mysql = require('mysql2/promise');
 // Database connection configuration
 const dbConfig = {
     host: 'localhost',
-    user: 'lynn_user',
-    password: 'secure_password',
-    database: 'lynns_database',
+    user: 'root',  // XAMPP default user
+    password: '',  // XAMPP default password (empty)
+    database: 'Contact_Manager',  // Your existing database
     port: 3306,
     connectionLimit: 10,
     acquireTimeout: 60000,
@@ -165,6 +165,102 @@ const dbOperations = {
             const [rows] = await connection.execute(query, params);
             connection.release();
             return rows;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    // Contact management operations
+    searchContacts: async (searchTerm) => {
+        const connection = await pool.getConnection();
+        try {
+            const query = `
+                SELECT id, name, email, phone, birthday, bio, interests, avatar, status, created_at, updated_at, last_viewed 
+                FROM contacts 
+                WHERE status = 'active' AND (name LIKE ? OR email LIKE ? OR phone LIKE ?)
+                ORDER BY name
+            `;
+            const params = [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`];
+            
+            const [rows] = await connection.execute(query, params);
+            connection.release();
+            return rows;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    getAllContacts: async () => {
+        const connection = await pool.getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT id, name, email, phone, birthday, bio, interests, avatar, status, created_at, updated_at, last_viewed FROM contacts WHERE status = "active" ORDER BY name'
+            );
+            connection.release();
+            return rows;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    addContact: async (contactData) => {
+        const connection = await pool.getConnection();
+        try {
+            const { name, email, phone, birthday, bio, interests, avatar = 'fas fa-user' } = contactData;
+            const [result] = await connection.execute(
+                'INSERT INTO contacts (name, email, phone, birthday, bio, interests, avatar, last_viewed) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())',
+                [name, email, phone, birthday, bio, interests, avatar]
+            );
+            connection.release();
+            return result.insertId;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    updateContact: async (contactId, contactData) => {
+        const connection = await pool.getConnection();
+        try {
+            const { name, email, phone, birthday, bio, interests } = contactData;
+            await connection.execute(
+                'UPDATE contacts SET name = ?, email = ?, phone = ?, birthday = ?, bio = ?, interests = ?, updated_at = NOW(), last_viewed = NOW() WHERE id = ?',
+                [name, email, phone, birthday, bio, interests, contactId]
+            );
+            connection.release();
+            return true;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    deleteContact: async (contactId) => {
+        const connection = await pool.getConnection();
+        try {
+            await connection.execute(
+                'UPDATE contacts SET status = "inactive", updated_at = NOW() WHERE id = ?',
+                [contactId]
+            );
+            connection.release();
+            return true;
+        } catch (error) {
+            connection.release();
+            throw error;
+        }
+    },
+
+    updateContactLastViewed: async (contactId) => {
+        const connection = await pool.getConnection();
+        try {
+            await connection.execute(
+                'UPDATE contacts SET last_viewed = NOW() WHERE id = ?',
+                [contactId]
+            );
+            connection.release();
         } catch (error) {
             connection.release();
             throw error;
