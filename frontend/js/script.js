@@ -1,4 +1,41 @@
 // Enhanced Database Website JavaScript
+// FORCE SET YOUR CONTACT MANAGER CONTACTS FIRST - BEFORE ANYTHING ELSE
+window.globalContacts = [
+    // Keep Lynn as requested
+    { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
+    // Your real contacts from Contact Manager database
+    { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
+    { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
+    { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
+    { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
+    { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
+];
+
+console.log('🎯 FORCE LOADED YOUR CONTACTS:', window.globalContacts.map(c => c.name).join(', '));
+
+// Clear any cached contacts from localStorage to force fresh load
+localStorage.removeItem('contacts');
+localStorage.setItem('contacts', JSON.stringify(window.globalContacts));
+console.log('🗑️ Cleared old localStorage and set new contacts');
+
+// EMERGENCY FUNCTION - Call this manually if contacts don't show
+window.forceRefreshContacts = function() {
+    console.log('🚨 EMERGENCY CONTACT REFRESH');
+    window.globalContacts = [
+        { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
+        { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
+        { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
+        { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
+        { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
+        { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
+    ];
+    localStorage.setItem('contacts', JSON.stringify(window.globalContacts));
+    console.log('🔄 Forced refresh complete. Contacts:', window.globalContacts.map(c => c.name));
+    if (typeof window.updateContactsDisplay === 'function') {
+        window.updateContactsDisplay();
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     // Login System
     const loginForm = document.getElementById('loginForm');
@@ -389,19 +426,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Global Contacts Management System - Updated with Contact Manager Database
-    let globalContacts = [
-        // Keep Lynn as requested
-        { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.' },
-        // Your real contacts from Contact Manager database
-        { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database.' },
-        { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database.' },
-        { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database.' },
-        { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database.' },
-        { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database.' }
-    ];
+    // NOTE: globalContacts is now set at the very top of the file to ensure it loads first
+    let globalContacts = window.globalContacts; // Use the already-set global contacts
 
-    // Make globalContacts accessible from global scope
-    window.globalContacts = globalContacts;
+    console.log('📋 Using pre-loaded globalContacts:', globalContacts.map(c => c.name).join(', '));
 
     // Global Contacts Manager
     window.ContactsManager = {
@@ -546,16 +574,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update contacts display
         function updateContactsDisplay() {
-            console.log('updateContactsDisplay called');
+            console.log('🔍 updateContactsDisplay called');
+            console.log('🔍 Current globalContacts:', globalContacts);
+            console.log('🔍 Contact names:', globalContacts.map(c => c.name));
             const favoritesGrid = document.getElementById('favoritesGrid');
             if (!favoritesGrid) {
-                console.log('favoritesGrid element not found');
+                console.log('❌ favoritesGrid element not found');
                 return;
             }
-            console.log('Updating contact display with', globalContacts.length, 'contacts');
+            console.log('✅ Updating contact display with', globalContacts.length, 'contacts');
+            
+            // FORCE use window.globalContacts if local globalContacts is wrong
+            const contactsToUse = window.globalContacts || globalContacts;
+            console.log('🎯 Using contacts:', contactsToUse.map(c => c.name));
 
-            // Get all contacts (favorites first)
-            const allContacts = [...globalContacts].sort((a, b) => {
+            // Get all contacts (favorites first) - FORCE use correct contacts
+            const allContacts = [...contactsToUse].sort((a, b) => {
                 if (a.favorite && !b.favorite) return -1;
                 if (!a.favorite && b.favorite) return 1;
                 return 0;

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Contact Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f0f2f5;
+        }
+        .contact { 
+            background: white; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .contact h3 { margin: 0 0 10px 0; color: #333; }
+        .contact p { margin: 5px 0; color: #666; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #output { 
+            background: #333; 
+            color: #00ff00; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Quick Contact Test</h1>
+    
+    <button onclick="loadFromScript()">Load from Script.js</button>
+    <button onclick="loadFromLocalStorage()">Load from localStorage</button>
+    <button onclick="clearAndRefresh()">Clear Cache & Refresh</button>
+    
+    <div id="output">Click buttons to test...</div>
+    <div id="contacts"></div>
+
+    <script src="js/script.js"></script>
+    <script>
+        function log(msg) {
+            document.getElementById('output').textContent += new Date().toLocaleTimeString() + ': ' + msg + '\n';
+        }
+        
+        function displayContacts(contacts, source) {
+            const container = document.getElementById('contacts');
+            container.innerHTML = `<h2>📋 Contacts from ${source}:</h2>`;
+            
+            if (!contacts || contacts.length === 0) {
+                container.innerHTML += '<p>❌ No contacts found</p>';
+                return;
+            }
+            
+            contacts.forEach(contact => {
+                const div = document.createElement('div');
+                div.className = 'contact';
+                div.innerHTML = `
+                    <h3>${contact.name}</h3>
+                    <p><strong>Role:</strong> ${contact.role}</p>
+                    <p><strong>Email:</strong> ${contact.email || 'Not provided'}</p>
+                    <p><strong>Phone:</strong> ${contact.phone || 'Not provided'}</p>
+                    <p><strong>Status:</strong> ${contact.status}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function loadFromScript() {
+            log('Loading from window.globalContacts...');
+            if (window.globalContacts) {
+                log(`Found ${window.globalContacts.length} contacts in globalContacts`);
+                displayContacts(window.globalContacts, 'window.globalContacts');
+            } else {
+                log('❌ window.globalContacts not found');
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            log('Loading from localStorage...');
+            const stored = localStorage.getItem('contacts');
+            if (stored) {
+                try {
+                    const contacts = JSON.parse(stored);
+                    log(`Found ${contacts.length} contacts in localStorage`);
+                    displayContacts(contacts, 'localStorage');
+                } catch (e) {
+                    log('❌ Error parsing localStorage: ' + e.message);
+                }
+            } else {
+                log('❌ No contacts in localStorage');
+            }
+        }
+        
+        function clearAndRefresh() {
+            localStorage.clear();
+            log('Cleared localStorage, refreshing...');
+            setTimeout(() => location.reload(), 1000);
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('Page loaded, testing...');
+            setTimeout(() => {
+                loadFromScript();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

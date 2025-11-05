@@ -14,18 +14,16 @@ const yourDatabaseContacts = [
 
 // Function to load your contacts into the website
 function loadYourDatabaseContacts() {
-    console.log('🔄 Loading your Contact Manager contacts (including Lynn)...');
+    console.log('🔄 FORCE LOADING your Contact Manager contacts (including Lynn)...');
     console.log(`📊 Importing ${yourDatabaseContacts.length} contacts`);
     
-    // Replace global contacts array with your contacts (including Lynn)
-    if (typeof window.globalContacts !== 'undefined') {
-        window.globalContacts.length = 0; // Clear existing contacts
-        window.globalContacts.push(...yourDatabaseContacts); // Add your contacts
-        console.log(`✅ Updated globalContacts with ${yourDatabaseContacts.length} contacts`);
-    } else {
-        window.globalContacts = [...yourDatabaseContacts];
-        console.log(`✅ Created globalContacts with ${yourDatabaseContacts.length} contacts`);
-    }
+    // FORCE clear localStorage first
+    localStorage.removeItem('contacts');
+    console.log('🗑️ Cleared old localStorage contacts');
+    
+    // FORCE replace global contacts array with your contacts (including Lynn)
+    window.globalContacts = [...yourDatabaseContacts]; // Completely replace, don't merge
+    console.log(`✅ FORCE Updated globalContacts with ${yourDatabaseContacts.length} contacts`);
     
     // Update localStorage as backup
     localStorage.setItem('contacts', JSON.stringify(yourDatabaseContacts));
@@ -37,16 +35,27 @@ function loadYourDatabaseContacts() {
         console.log(`- ${contact.name}${contact.email ? ' (' + contact.email + ')' : ''}${contact.phone ? ' - ' + contact.phone : ''}`);
     });
     
-    // Trigger display updates
+    // IMMEDIATE display updates (no timeout)
+    if (typeof window.updateContactsDisplay === 'function') {
+        window.updateContactsDisplay();
+        console.log('✅ IMMEDIATE Updated contacts display');
+    }
+    
+    if (typeof window.updateRecentContacts === 'function') {
+        window.updateRecentContacts();
+        console.log('✅ IMMEDIATE Updated recent contacts');
+    }
+    
+    // Also trigger after delay as backup
     setTimeout(() => {
         if (typeof window.updateContactsDisplay === 'function') {
             window.updateContactsDisplay();
-            console.log('✅ Updated contacts display');
+            console.log('✅ DELAYED Updated contacts display');
         }
         
         if (typeof window.updateRecentContacts === 'function') {
             window.updateRecentContacts();
-            console.log('✅ Updated recent contacts');
+            console.log('✅ DELAYED Updated recent contacts');
         }
         
         // Show success notification
@@ -55,7 +64,7 @@ function loadYourDatabaseContacts() {
         } else {
             alert(`✅ Success! Loaded ${yourDatabaseContacts.length} contacts: ${yourDatabaseContacts.map(c => c.name).join(', ')}`);
         }
-    }, 500);
+    }, 1000);
     
     return true;
 }
@@ -64,11 +73,23 @@ function loadYourDatabaseContacts() {
 window.loadYourDatabaseContacts = loadYourDatabaseContacts;
 window.yourDatabaseContacts = yourDatabaseContacts;
 
-// Auto-load your contacts
+// Auto-load your contacts IMMEDIATELY and with backup
+console.log('🚀 IMMEDIATE Auto-loading your Contact Manager contacts...');
+loadYourDatabaseContacts();
+
+// Also load after delay as backup
 setTimeout(() => {
-    console.log('🚀 Auto-loading your Contact Manager contacts...');
+    console.log('🚀 BACKUP Auto-loading your Contact Manager contacts...');
     loadYourDatabaseContacts();
-}, 2000);
+}, 1000);
+
+// And load when DOM is fully ready as triple backup
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        console.log('🚀 DOM-READY Auto-loading your Contact Manager contacts...');
+        loadYourDatabaseContacts();
+    }, 500);
+});
 
 console.log('📊 Your Contact Manager integration loaded!');
 console.log(`👥 Ready to load ${yourDatabaseContacts.length} contacts (including Lynn): ${yourDatabaseContacts.map(c => c.name).join(', ')}`);

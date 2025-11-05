@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache and Test Contacts</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            margin: 10px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .success { background: linear-gradient(45deg, #2ecc71, #27ae60) !important; }
+        .info { background: linear-gradient(45deg, #3498db, #2980b9) !important; }
+        #output { 
+            background: rgba(0,0,0,0.3); 
+            color: #00ff00; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0; 
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .contact-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Contact Cache Clear & Test Tool</h1>
+        
+        <p>Use this page to clear cache and test your Contact Manager integration.</p>
+        
+        <button onclick="clearAllCache()" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">🗑️ Clear All Cache</button>
+        <button onclick="testContactLoad()" class="info">🔄 Test Contact Load</button>
+        <button onclick="showCurrentContacts()" class="success">👥 Show Current Contacts</button>
+        <button onclick="goToWebsite()" class="info">🌐 Go to Website</button>
+        
+        <div id="output">Click buttons to test...</div>
+        
+        <div id="contacts-display"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const contactsDisplay = document.getElementById('contacts-display');
+        
+        function log(message) {
+            output.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            console.log(message);
+        }
+        
+        function clearAllCache() {
+            // Clear localStorage
+            localStorage.clear();
+            log('✅ Cleared localStorage');
+            
+            // Clear sessionStorage
+            sessionStorage.clear();
+            log('✅ Cleared sessionStorage');
+            
+            // Force reload with cache bypass
+            log('🔄 Forcing cache bypass reload...');
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1000);
+        }
+        
+        function testContactLoad() {
+            log('🔄 Testing contact load...');
+            
+            // Test data - your contacts
+            const testContacts = [
+                { id: 1, name: 'Lynn Davis', role: 'Administrator', email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567' },
+                { id: 2, name: 'Kathy', role: 'User', email: '', phone: '' },
+                { id: 3, name: 'Michael', role: 'User', email: '', phone: '4694266925' },
+                { id: 4, name: 'Nathan', role: 'User', email: 'NathanLorenzen1@gmail.com', phone: '8649154169' },
+                { id: 5, name: 'Willie', role: 'User', email: 'atuasmedium@gmail.com', phone: '' },
+                { id: 6, name: 'Scarlett', role: 'User', email: 'Scarlettfromash@gmail.com', phone: '9124679551' }
+            ];
+            
+            // Store in localStorage
+            localStorage.setItem('contacts', JSON.stringify(testContacts));
+            log(`✅ Stored ${testContacts.length} test contacts in localStorage`);
+            
+            // Display contacts
+            displayContacts(testContacts);
+        }
+        
+        function showCurrentContacts() {
+            log('👥 Checking current contacts...');
+            
+            const stored = localStorage.getItem('contacts');
+            if (stored) {
+                try {
+                    const contacts = JSON.parse(stored);
+                    log(`📋 Found ${contacts.length} contacts in localStorage:`);
+                    contacts.forEach(contact => {
+                        log(`  - ${contact.name} (${contact.role})`);
+                    });
+                    displayContacts(contacts);
+                } catch (e) {
+                    log('❌ Error parsing contacts: ' + e.message);
+                }
+            } else {
+                log('❌ No contacts found in localStorage');
+            }
+        }
+        
+        function displayContacts(contacts) {
+            contactsDisplay.innerHTML = '<h3>📋 Current Contacts:</h3>';
+            contacts.forEach(contact => {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.innerHTML = `
+                    <strong>${contact.name}</strong> - ${contact.role}<br>
+                    Email: ${contact.email || 'Not provided'}<br>
+                    Phone: ${contact.phone || 'Not provided'}
+                `;
+                contactsDisplay.appendChild(card);
+            });
+        }
+        
+        function goToWebsite() {
+            log('🌐 Opening website...');
+            window.open('frontend/html/index.html', '_blank');
+        }
+        
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            log('🚀 Cache test tool loaded');
+            showCurrentContacts();
+        });
+    </script>
+</body>
+</html>
