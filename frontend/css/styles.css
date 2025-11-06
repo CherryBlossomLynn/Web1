@@ -5496,6 +5496,98 @@ select:focus-visible {
     font-size: 1.1em;
 }
 
+/* Browse All Search Section */
+.browse-search-section {
+    margin: 30px 0;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.browse-search-section .search-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.browse-search-section .search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.browse-search-section .search-box input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 16px;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.browse-search-section .search-box input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.browse-search-section .search-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.browse-search-section .search-btn:hover {
+    background: #1976d2;
+}
+
+.browse-search-section .search-filters {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.browse-search-section .filter-select {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    min-width: 150px;
+    transition: border-color 0.2s ease;
+}
+
+.browse-search-section .filter-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* No Results Message */
+.no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-results p {
+    font-size: 18px;
+    margin: 0;
+}
+
 .browse-contacts-results {
     margin-top: 40px;
 }
@@ -5523,5 +5615,19 @@ select:focus-visible {
         font-size: 2em;
         flex-direction: column;
         gap: 10px;
+    }
+    
+    .browse-search-section {
+        padding: 20px 15px;
+        margin: 20px 0;
+    }
+    
+    .browse-search-section .search-filters {
+        flex-direction: column;
+    }
+    
+    .browse-search-section .filter-select {
+        min-width: auto;
+        width: 100%;
     }
 }

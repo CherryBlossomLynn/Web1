@@ -130,6 +130,11 @@ window.showBrowseAllPage = function() {
         browseAllPage.style.display = 'block';
         console.log('✅ Browse All page shown');
         
+        // Initialize search functionality for Browse All page
+        setTimeout(() => {
+            initializeBrowseAllSearch();
+        }, 200);
+        
         // Load the contacts immediately and with a backup
         loadAllContacts();
         setTimeout(loadAllContacts, 100);
@@ -262,6 +267,149 @@ async function copyExistingContactCards() {
     
     console.log(`✅ Successfully displayed ${allContacts.length} contacts (both favorited and unfavorited)`);
 }
+
+// Browse All Search Functionality
+function initializeBrowseAllSearch() {
+    const searchBtn = document.getElementById('browseSearchBtn');
+    const searchInput = document.getElementById('browseSearchInput');
+    const statusFilter = document.getElementById('browseStatusFilter');
+    const favoriteFilter = document.getElementById('browseFavoriteFilter');
+
+    if (!searchBtn || !searchInput) {
+        console.log('Browse search elements not found, skipping initialization');
+        return;
+    }
+
+    function performBrowseSearch() {
+        const query = searchInput.value.toLowerCase().trim();
+        console.log('🔍 Performing browse search with query:', query);
+
+        // Get all contacts from database
+        let results = window.globalContacts || [];
+        console.log('📋 Starting with', results.length, 'total contacts');
+
+        // Filter by search query if provided
+        if (query) {
+            results = results.filter(contact =>
+                contact.name.toLowerCase().includes(query) ||
+                (contact.email && contact.email.toLowerCase().includes(query)) ||
+                (contact.phone && contact.phone.toLowerCase().includes(query)) ||
+                (contact.role && contact.role.toLowerCase().includes(query))
+            );
+            console.log('🔍 Filtered by query to', results.length, 'contacts');
+        }
+
+        // Filter by status if selected
+        const statusFilterValue = statusFilter.value;
+        if (statusFilterValue) {
+            results = results.filter(contact => 
+                contact.status && contact.status.toLowerCase() === statusFilterValue.toLowerCase()
+            );
+            console.log('📊 Filtered by status to', results.length, 'contacts');
+        }
+
+        // Filter by favorite status if selected
+        const favoriteFilterValue = favoriteFilter.value;
+        if (favoriteFilterValue === 'favorites') {
+            results = results.filter(contact => contact.favorite === true);
+            console.log('⭐ Filtered to favorites only:', results.length, 'contacts');
+        } else if (favoriteFilterValue === 'non-favorites') {
+            results = results.filter(contact => contact.favorite !== true);
+            console.log('☆ Filtered to non-favorites only:', results.length, 'contacts');
+        }
+
+        // Display filtered results
+        displayFilteredBrowseResults(results, query || 'all contacts');
+    }
+
+    function displayFilteredBrowseResults(contacts, searchTerm) {
+        const browseGrid = document.getElementById('browseContactsGrid');
+        const contactsCount = document.getElementById('browseContactsCount');
+        const browseEmpty = document.getElementById('browseEmpty');
+
+        if (!browseGrid) return;
+
+        if (contacts.length === 0) {
+            browseGrid.innerHTML = '<div class="no-results"><p>No contacts found matching your search.</p></div>';
+            if (contactsCount) contactsCount.textContent = 'No contacts found';
+            if (browseEmpty) browseEmpty.style.display = 'block';
+            browseGrid.style.display = 'none';
+            return;
+        }
+
+        // Generate HTML for filtered contacts (same as copyExistingContactCards)
+        const contactsHTML = contacts.map(contact => {
+            const statusClass = (contact.status || 'offline').toLowerCase();
+            const favoriteClass = contact.favorite ? 'active' : '';
+            const starIcon = contact.favorite ? 'fas fa-star' : 'far fa-star';
+            const favoriteTitle = contact.favorite ? 'Remove from Favorites' : 'Add to Favorites';
+
+            return `
+                <div class="contact-card" data-contact-id="${contact.id}">
+                    <div class="contact-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>${contact.name}</h4>
+                        <p class="contact-role">${contact.role || 'User'}</p>
+                        <p class="contact-status ${statusClass}">${contact.status || 'Offline'}</p>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(${contact.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="contact-btn" title="Send Message" onclick="sendMessage(${contact.id})">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button class="contact-btn favorite-btn ${favoriteClass}" title="${favoriteTitle}" onclick="toggleFavorite(${contact.id})">
+                            <i class="${starIcon}"></i>
+                        </button>
+                        <button class="contact-btn delete-btn" onclick="removeContact(${contact.id})" title="Delete Contact">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        browseGrid.innerHTML = contactsHTML;
+        if (contactsCount) {
+            contactsCount.textContent = `${contacts.length} contact${contacts.length !== 1 ? 's' : ''} found`;
+        }
+        if (browseEmpty) browseEmpty.style.display = 'none';
+        browseGrid.style.display = 'grid';
+
+        console.log(`✅ Displayed ${contacts.length} filtered contacts`);
+    }
+
+    // Event listeners
+    searchBtn.addEventListener('click', performBrowseSearch);
+    
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performBrowseSearch();
+        }
+    });
+
+    searchInput.addEventListener('input', function() {
+        // Real-time search as user types
+        if (searchInput.value.length === 0) {
+            // If search is cleared, show all contacts
+            copyExistingContactCards();
+        }
+    });
+
+    // Filter change listeners
+    statusFilter.addEventListener('change', performBrowseSearch);
+    favoriteFilter.addEventListener('change', performBrowseSearch);
+
+    console.log('✅ Browse All search functionality initialized');
+}
+
+// Initialize Browse All search when contacts are loaded
+window.addEventListener('contactsLoaded', () => {
+    initializeBrowseAllSearch();
+});
 
 // ESSENTIAL: Define toggleFavorite function IMMEDIATELY for HTML onclick handlers
 window.toggleFavorite = function(contactId) {

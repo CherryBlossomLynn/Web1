@@ -1451,6 +1451,34 @@
                         <p>Browse through all your added contacts</p>
                     </div>
 
+                    <!-- Search Section -->
+                    <div class="browse-search-section">
+                        <div class="search-container">
+                            <div class="search-box">
+                                <label for="browseSearchInput" class="sr-only">Search contacts in Browse All</label>
+                                <input type="text" id="browseSearchInput"
+                                    placeholder="Search contacts..."
+                                    aria-describedby="browse-search-help">
+                                <button id="browseSearchBtn" class="search-btn" aria-describedby="browse-search-help">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="search-filters">
+                                <select id="browseStatusFilter" class="filter-select">
+                                    <option value="">All Status</option>
+                                    <option value="online">Online</option>
+                                    <option value="offline">Offline</option>
+                                    <option value="away">Away</option>
+                                </select>
+                                <select id="browseFavoriteFilter" class="filter-select">
+                                    <option value="">All Contacts</option>
+                                    <option value="favorites">Favorites Only</option>
+                                    <option value="non-favorites">Non-Favorites</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Contacts Display -->
                     <div class="browse-contacts-results">
                         <div class="contacts-count">
