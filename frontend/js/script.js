@@ -1427,14 +1427,21 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         function performSearch() {
             const query = searchInput.value.toLowerCase().trim();
-            const roleFilterValue = roleFilter.value;
-            const statusFilterValue = statusFilter.value;
+            
+            // If no query, don't open the panel
+            if (!query) return;
+
+            // Open the search side panel
+            openSearchPanel();
+
+            const roleFilterValue = document.getElementById('roleFilter').value;
+            const statusFilterValue = document.getElementById('statusFilter').value;
             const searchLoading = document.getElementById('searchLoading');
             const searchResults = document.getElementById('searchResults');
 
             console.log('Performing search with query:', query);
 
-            // Show loading state
+            // Show loading state in side panel
             searchResults.style.display = 'none';
             searchLoading.style.display = 'block';
 
@@ -1443,16 +1450,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 let results = getContactsForSearch();
                 console.log('Found', results.length, 'total contacts');
 
-                // If no search query, show all contacts
-                // If there is a search query, filter by it
-                if (query) {
-                    results = results.filter(user =>
-                        user.name.toLowerCase().includes(query) ||
-                        user.email.toLowerCase().includes(query) ||
-                        user.role.toLowerCase().includes(query)
-                    );
-                    console.log('Filtered to', results.length, 'contacts matching query');
-                }
+                // Filter by search query
+                results = results.filter(user =>
+                    user.name.toLowerCase().includes(query) ||
+                    user.email.toLowerCase().includes(query) ||
+                    user.role.toLowerCase().includes(query)
+                );
+                console.log('Filtered to', results.length, 'contacts matching query');
 
                 // Filter by role
                 if (roleFilterValue) {
@@ -1538,13 +1542,30 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         }
 
-        if (roleFilter) {
-            roleFilter.addEventListener('change', performSearch);
+        // Setup filter event listeners after the search panel is opened
+        function setupFilterListeners() {
+            const roleFilter = document.getElementById('roleFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            if (roleFilter) {
+                roleFilter.addEventListener('change', () => {
+                    if (document.getElementById('searchSidePanel').classList.contains('active')) {
+                        performSearch();
+                    }
+                });
+            }
+
+            if (statusFilter) {
+                statusFilter.addEventListener('change', () => {
+                    if (document.getElementById('searchSidePanel').classList.contains('active')) {
+                        performSearch();
+                    }
+                });
+            }
         }
 
-        if (statusFilter) {
-            statusFilter.addEventListener('change', performSearch);
-        }
+        // Initialize filter listeners
+        setupFilterListeners();
 
         // Function to update contact search results display
         function updateContactSearchResults() {
@@ -1618,6 +1639,31 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Make function available globally
         window.updateContactSearchResults = updateContactSearchResults;
     }
+
+    // Search panel control functions
+    function openSearchPanel() {
+        const searchPanel = document.getElementById('searchSidePanel');
+        const searchOverlay = document.getElementById('searchOverlay');
+        
+        if (searchPanel && searchOverlay) {
+            searchPanel.classList.add('active');
+            searchOverlay.classList.add('active');
+        }
+    }
+
+    function closeSearchPanel() {
+        const searchPanel = document.getElementById('searchSidePanel');
+        const searchOverlay = document.getElementById('searchOverlay');
+        
+        if (searchPanel && searchOverlay) {
+            searchPanel.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        }
+    }
+
+    // Make search panel functions globally available
+    window.openSearchPanel = openSearchPanel;
+    window.closeSearchPanel = closeSearchPanel;
 
     function showCustomizationTabs() {
         // Scroll to customization tabs within the account page

@@ -31,6 +31,9 @@
     <!-- Auto-save indicator -->
     <div class="auto-save-indicator">Auto-saved</div>
 
+    <!-- Search overlay -->
+    <div id="searchOverlay" class="search-overlay" onclick="closeSearchPanel()"></div>
+
     <div class="container" role="main">
         <header>
             <div class="brand-header">
@@ -99,6 +102,38 @@
                     </button>
                 </div>
             </nav>
+
+            <!-- Search Side Panel -->
+            <div id="searchSidePanel" class="search-side-panel" style="display: none;">
+                <div class="search-panel-header">
+                    <h3><i class="fas fa-search"></i> Search Results</h3>
+                    <button class="close-search-btn" onclick="closeSearchPanel()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-panel-content">
+                    <div class="search-filters-compact">
+                        <select id="roleFilter" class="filter-select">
+                            <option value="">All Roles</option>
+                            <option value="Administrator">Administrator</option>
+                            <option value="User">User</option>
+                        </select>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Away">Away</option>
+                            <option value="Offline">Offline</option>
+                        </select>
+                    </div>
+                    <div id="searchLoading" class="search-loading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Searching...</p>
+                    </div>
+                    <div id="searchResults" class="search-results-container">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </div>
 
             <!-- Main Page Content -->
             <div id="mainPage" class="page-content">
