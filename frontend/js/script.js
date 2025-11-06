@@ -36,6 +36,34 @@ window.forceRefreshContacts = function() {
     }
 };
 
+// IMMEDIATE TEST - Define test function right away
+console.log('🔥 SCRIPT LOADING - IMMEDIATE TEST');
+window.immediateTest = function() {
+    alert('IMMEDIATE TEST WORKS!');
+    console.log('✅ Immediate test function executed');
+};
+console.log('✅ Immediate test function defined');
+
+// DEFINE LOGOUT FUNCTION IMMEDIATELY - Outside of any complex scoping
+console.log('🔥 DEFINING LOGOUT FUNCTION');
+window.handleLogout = function() {
+    console.log('🚪 handleLogout function called');
+    alert('Logout function called! This should work now.');
+    
+    // Simple test first - just clear and reload
+    console.log('Clearing localStorage...');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+    
+    console.log('Reloading page...');
+    location.reload();
+};
+console.log('✅ handleLogout function defined');
+
+// Also create backup name
+window.logout = window.handleLogout;
+console.log('✅ logout alias created');
+
 document.addEventListener('DOMContentLoaded', async function () {
     // Initialize database-driven interests system first
     console.log('🚀 Starting application initialization...');
@@ -64,8 +92,15 @@ document.addEventListener('DOMContentLoaded', async function () {
     ];
 
     // Check if already logged in
-    if (localStorage.getItem('isLoggedIn') === 'true') {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const currentUser = localStorage.getItem('currentUser');
+    console.log('🔐 Authentication check:', { isLoggedIn, currentUser });
+    
+    if (isLoggedIn) {
+        console.log('✅ User is logged in, showing main content');
         showMainContent();
+    } else {
+        console.log('❌ User not logged in, showing login page');
     }
     
     // Force load contacts if main content is already visible after a delay
@@ -133,7 +168,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         initializeMainPage();
-        initializeAccountFeatures();
+        
+        // Add a small delay to ensure DOM is fully rendered
+        setTimeout(() => {
+            initializeAccountFeatures();
+        }, 100);
+        
         updateMessageBadge();
         
         // Immediately load and display contacts
@@ -189,15 +229,76 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function initializeAccountFeatures() {
-        // Logout functionality
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function () {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('currentUser');
-                location.reload();
-            });
+        console.log('initializeAccountFeatures() called');
+        
+        // Try multiple ways to find the logout button
+        let logoutBtn = document.getElementById('logoutBtn');
+        if (!logoutBtn) {
+            logoutBtn = document.querySelector('#logoutBtn');
         }
+        if (!logoutBtn) {
+            logoutBtn = document.querySelector('.logout-btn');
+        }
+        
+        console.log('Logout button element:', logoutBtn);
+        console.log('All elements with logout class:', document.querySelectorAll('.logout-btn'));
+        
+        if (logoutBtn) {
+            console.log('Logout button found and event listener added');
+            logoutBtn.addEventListener('click', function (e) {
+                console.log('Logout button clicked!');
+                e.preventDefault();
+                
+                // Call backend logout endpoint to destroy session
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include' // Include cookies for session
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Logout response:', data);
+                    if (data.success) {
+                        // Clear local storage
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        
+                        // Show logout notification
+                        showNotification('Logged out successfully', 'success');
+                        
+                        // Reload page after a brief delay to show notification
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showNotification('Logout failed: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    // Even if backend fails, clear local data and reload
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    showNotification('Logged out (connection error)', 'warning');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                });
+            });
+        } else {
+            console.log('Logout button not found!');
+        }
+
+        // Also try to add event listener using a different approach
+        document.addEventListener('click', function(e) {
+            if (e.target && (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn'))) {
+                console.log('Logout button clicked via event delegation!');
+                e.preventDefault();
+                handleLogout();
+            }
+        });
 
         // Edit Profile button - scroll to profile tab
         const editProfileBtn = document.getElementById('editProfileBtn');
@@ -1814,9 +1915,42 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Add logout functionality (optional)
     function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('currentUser');
-        location.reload();
+        // Call backend logout endpoint to destroy session
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include' // Include cookies for session
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear local storage
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                
+                // Show logout notification
+                showNotification('Logged out successfully', 'success');
+                
+                // Reload page after a brief delay to show notification
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showNotification('Logout failed: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Logout error:', error);
+            // Even if backend fails, clear local data and reload
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            showNotification('Logged out (connection error)', 'warning');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        });
     }
 
     // Notification System
@@ -3576,7 +3710,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     window.importUserData = importUserData;
     window.clearAllData = clearAllData;
-    window.logout = logout;
+    
+    // Debug function to check button status
+    window.checkLogoutButton = function() {
+        const btn = document.getElementById('logoutBtn');
+        console.log('Logout button element:', btn);
+        console.log('Button visible:', btn ? window.getComputedStyle(btn).display : 'not found');
+        console.log('Button onclick:', btn ? btn.onclick : 'N/A');
+        console.log('IsLoggedIn:', localStorage.getItem('isLoggedIn'));
+        console.log('CurrentUser:', localStorage.getItem('currentUser'));
+        return btn;
+    };
+    
+    window.logout = window.handleLogout; // Keep backward compatibility
     window.initializeProfileSystem = initializeProfileSystem;
     window.toggleAdvancedSearch = toggleAdvancedSearch;
     window.clearFilters = clearFilters;
