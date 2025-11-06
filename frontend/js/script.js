@@ -3904,13 +3904,17 @@ window.viewContactProfile = function(contactId) {
         // Update favorite button
         const favoriteIcon = document.getElementById('detailsFavoriteIcon');
         const favoriteText = document.getElementById('detailsFavoriteText');
+        const favoriteBtn = favoriteIcon ? favoriteIcon.closest('button') : null;
+        
         if (favoriteIcon && favoriteText) {
             if (contact.favorite) {
                 favoriteIcon.className = 'fas fa-star';
                 favoriteText.textContent = 'Remove from Favorites';
+                if (favoriteBtn) favoriteBtn.classList.add('favorite-active');
             } else {
                 favoriteIcon.className = 'far fa-star';
                 favoriteText.textContent = 'Add to Favorites';
+                if (favoriteBtn) favoriteBtn.classList.remove('favorite-active');
             }
         }
         
