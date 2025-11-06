@@ -132,7 +132,7 @@
                     <div class="contacts-container">
                         <!-- Favorites Section -->
                         <div class="contacts-favorites">
-                            <h3></h3>
+                            <h3><i class="fas fa-star" style="color: #ffd700; margin-right: 8px;"></i>Favorites</h3>
                             <div class="contacts-grid" id="favoritesGrid">
                                 <!-- Contact Card 1 - Lynn Davis (Administrator) - KEPT AS REQUESTED -->
                                 <div class="contact-card" data-contact-id="1">
@@ -1418,9 +1418,48 @@
     
     <!-- Simple working star toggle function -->
     <script>
-        // Override the toggleFavorite function with a simple working version
+        // Load favorites from localStorage
+        window.loadFavorites = function() {
+            const favorites = JSON.parse(localStorage.getItem('contactFavorites') || '{}');
+            console.log('📂 Loading saved favorites:', favorites);
+            
+            // Apply saved favorite status to all contact cards
+            document.querySelectorAll('.contact-card').forEach(card => {
+                const contactId = card.dataset.contactId;
+                const starIcon = card.querySelector('.favorite-btn i');
+                const favoriteBtn = card.querySelector('.favorite-btn');
+                
+                if (favorites[contactId]) {
+                    starIcon.className = 'fas fa-star';
+                    favoriteBtn.title = 'Remove from favorites';
+                    console.log('⭐ Restored favorite for contact:', contactId);
+                } else {
+                    starIcon.className = 'far fa-star';
+                    favoriteBtn.title = 'Add to favorites';
+                }
+            });
+        };
+
+        // Save favorites to localStorage
+        window.saveFavorites = function() {
+            const favorites = {};
+            
+            document.querySelectorAll('.contact-card').forEach(card => {
+                const contactId = card.dataset.contactId;
+                const starIcon = card.querySelector('.favorite-btn i');
+                
+                if (starIcon.classList.contains('fas')) {
+                    favorites[contactId] = true;
+                }
+            });
+            
+            localStorage.setItem('contactFavorites', JSON.stringify(favorites));
+            console.log('💾 Saved favorites to localStorage:', favorites);
+        };
+
+        // Override the toggleFavorite function with persistent version
         window.toggleFavorite = function(contactId) {
-            console.log('⭐ SIMPLE toggleFavorite called with contactId:', contactId);
+            console.log('⭐ PERSISTENT toggleFavorite called with contactId:', contactId);
             
             const card = document.querySelector(`[data-contact-id="${contactId}"]`);
             if (!card) {
@@ -1450,9 +1489,95 @@
                 starIcon.className = 'fas fa-star';
                 console.log('⭐ Added to favorites - changed to filled star');
             }
+            
+            // Save the updated favorites to localStorage
+            saveFavorites();
         };
         
         console.log('⭐ Simple toggleFavorite function loaded');
+        
+        // Contact search functionality
+        window.searchContacts = function() {
+            const searchInput = document.getElementById('userSearchInput');
+            const query = searchInput.value.toLowerCase().trim();
+            const contactCards = document.querySelectorAll('#favoritesGrid .contact-card');
+            
+            console.log('🔍 Searching contacts with query:', query);
+            
+            contactCards.forEach(card => {
+                const name = card.querySelector('h4').textContent.toLowerCase();
+                const role = card.querySelector('.contact-role').textContent.toLowerCase();
+                const status = card.querySelector('.contact-status').textContent.toLowerCase();
+                
+                // Check if query matches name, role, or status
+                const matches = !query || 
+                    name.includes(query) || 
+                    role.includes(query) || 
+                    status.includes(query);
+                
+                if (matches) {
+                    card.style.display = 'block';
+                    console.log('✅ Showing contact:', name);
+                } else {
+                    card.style.display = 'none';
+                    console.log('❌ Hiding contact:', name);
+                }
+            });
+            
+            // Show message if no results found
+            const visibleCards = document.querySelectorAll('#favoritesGrid .contact-card[style*="block"], #favoritesGrid .contact-card:not([style*="none"])');
+            const grid = document.getElementById('favoritesGrid');
+            
+            // Remove existing no-results message
+            const existingMessage = grid.querySelector('.no-search-results');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            if (query && visibleCards.length === 0) {
+                const noResultsMessage = document.createElement('div');
+                noResultsMessage.className = 'no-search-results';
+                noResultsMessage.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <h3>No contacts found</h3>
+                        <p>No contacts match "${query}". Try a different search term.</p>
+                    </div>
+                `;
+                grid.appendChild(noResultsMessage);
+            }
+        };
+        
+        // Initialize search functionality and load favorites when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('userSearchInput');
+            const searchBtn = document.getElementById('searchUserBtn');
+            
+            if (searchInput && searchBtn) {
+                // Search on button click
+                searchBtn.addEventListener('click', searchContacts);
+                
+                // Search on Enter key
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchContacts();
+                    }
+                });
+                
+                // Real-time search as user types
+                searchInput.addEventListener('input', function() {
+                    // Debounce the search to avoid too many calls
+                    clearTimeout(window.searchTimeout);
+                    window.searchTimeout = setTimeout(searchContacts, 300);
+                });
+                
+                console.log('🔍 Contact search functionality initialized');
+            }
+            
+            // Load saved favorites from localStorage
+            loadFavorites();
+            console.log('⭐ Favorites loaded from localStorage');
+        });
     </script>
 </body>
 
