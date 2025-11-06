@@ -38,7 +38,7 @@ app.use(session({
 }));
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // API Routes
 
@@ -271,7 +271,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve the main website
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'lynn-website.html'));
+    res.sendFile(path.join(__dirname, '../frontend/html/index.html'));
 });
 
 // 404 handler
