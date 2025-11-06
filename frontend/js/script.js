@@ -290,12 +290,26 @@ function initializeBrowseAllSearch() {
 
         // Filter by search query if provided
         if (query) {
-            results = results.filter(contact =>
-                contact.name.toLowerCase().includes(query) ||
-                (contact.email && contact.email.toLowerCase().includes(query)) ||
-                (contact.phone && contact.phone.toLowerCase().includes(query)) ||
-                (contact.role && contact.role.toLowerCase().includes(query))
-            );
+            results = results.filter(contact => {
+                const name = contact.name.toLowerCase();
+                const email = (contact.email || '').toLowerCase();
+                const phone = (contact.phone || '').toLowerCase();
+                const role = (contact.role || '').toLowerCase();
+                
+                // Check for partial name matches (starts with, contains, or similar)
+                const nameMatches = 
+                    name.startsWith(query) ||                    // Starts with search term
+                    name.includes(query) ||                      // Contains search term anywhere
+                    query.length >= 2 && name.startsWith(query.substring(0, 2)); // First two letters match
+                
+                // Also check other fields for exact or partial matches
+                const otherMatches = 
+                    email.includes(query) ||
+                    phone.includes(query) ||
+                    role.includes(query);
+                
+                return nameMatches || otherMatches;
+            });
             console.log('🔍 Filtered by query to', results.length, 'contacts');
         }
 
@@ -2209,13 +2223,26 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             let filteredContacts = userContacts;
             
-            // Filter by search query
+            // Filter by search query with improved matching
             if (query) {
-                filteredContacts = filteredContacts.filter(contact => 
-                    contact.name.toLowerCase().includes(query) ||
-                    (contact.role || '').toLowerCase().includes(query) ||
-                    (contact.status || '').toLowerCase().includes(query)
-                );
+                filteredContacts = filteredContacts.filter(contact => {
+                    const name = contact.name.toLowerCase();
+                    const role = (contact.role || '').toLowerCase();
+                    const status = (contact.status || '').toLowerCase();
+                    
+                    // Check for partial name matches (starts with, contains, or similar)
+                    const nameMatches = 
+                        name.startsWith(query) ||                    // Starts with search term
+                        name.includes(query) ||                      // Contains search term anywhere
+                        query.length >= 2 && name.startsWith(query.substring(0, 2)); // First two letters match
+                    
+                    // Also check other fields for matches
+                    const otherMatches = 
+                        role.includes(query) ||
+                        status.includes(query);
+                    
+                    return nameMatches || otherMatches;
+                });
             }
             
             // Filter by role
