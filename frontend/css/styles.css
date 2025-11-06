@@ -627,14 +627,12 @@ h1 {
     transform: scale(1.1);
 }
 
-.favorite-btn.active {
-    background: rgba(255, 215, 0, 0.2);
-    border-color: rgba(255, 215, 0, 0.5);
+.favorite-btn i.fas {
     color: #ffd700;
 }
 
-.favorite-btn.active:hover {
-    background: rgba(255, 215, 0, 0.3);
+.favorite-btn i.far {
+    color: #666;
 }
 
 .recent-contacts-list {
