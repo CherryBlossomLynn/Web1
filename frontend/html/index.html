@@ -122,6 +122,9 @@
                                         </button>
                                     </div>
                                 </div>
+                                <button id="browseAllBtn" class="add-contact-btn" onclick="showAllContactsForSearch()" style="margin-right: 10px;">
+                                    <i class="fas fa-users"></i> Browse All
+                                </button>
                                 <button id="addContactBtn" class="add-contact-btn" onclick="document.getElementById('mainPage').style.display='none'; document.getElementById('addContactPage').style.display='block';">
                                     <i class="fas fa-plus"></i> Add Contact
                                 </button>
@@ -132,7 +135,7 @@
                     <div class="contacts-container">
                         <!-- Favorites Section -->
                         <div class="contacts-favorites">
-                            <h3></h3>
+                            <h3><i class="fas fa-star" style="color: #ffd700; margin-right: 8px;"></i>Favorites</h3>
                             <div class="contacts-grid" id="favoritesGrid">
                                 <!-- Contact Card 1 - Lynn Davis (Administrator) - KEPT AS REQUESTED -->
                                 <div class="contact-card" data-contact-id="1">
@@ -150,6 +153,9 @@
                                         </button>
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(1)">
                                             <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn active" title="Remove from Favorites" onclick="toggleFavorite(1)">
+                                            <i class="fas fa-star"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(1)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>
@@ -174,6 +180,9 @@
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(2)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites" onclick="toggleFavorite(2)">
+                                            <i class="far fa-star"></i>
+                                        </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(2)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -196,6 +205,9 @@
                                         </button>
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(3)">
                                             <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites" onclick="toggleFavorite(3)">
+                                            <i class="far fa-star"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(3)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>
@@ -220,6 +232,9 @@
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(4)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites" onclick="toggleFavorite(4)">
+                                            <i class="far fa-star"></i>
+                                        </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(4)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -243,6 +258,9 @@
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(5)">
                                             <i class="fas fa-envelope"></i>
                                         </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites" onclick="toggleFavorite(5)">
+                                            <i class="far fa-star"></i>
+                                        </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(5)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -265,6 +283,9 @@
                                         </button>
                                         <button class="contact-btn" title="Send Message" onclick="sendMessage(6)">
                                             <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="contact-btn favorite-btn" title="Add to Favorites" onclick="toggleFavorite(6)">
+                                            <i class="far fa-star"></i>
                                         </button>
                                         <button class="contact-btn delete-btn" onclick="removeContact(6)" title="Delete Contact">
                                             <i class="fas fa-trash"></i>

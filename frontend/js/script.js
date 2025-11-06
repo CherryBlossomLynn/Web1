@@ -11,6 +11,167 @@ window.globalContacts = [
     { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database. Young gamer who loves variety.', interests: { videogames: ['Minecraft', 'Mobile Games', 'Creative Games'], physicalGames: ['Tag', 'Board Games', 'Sports'], media: ['Teen Movies', 'Music Videos', 'Social Media Content'] } }
 ];
 
+// IMMEDIATELY set window.contacts to point to globalContacts
+window.contacts = window.globalContacts;
+
+console.log('🚀 Contacts initialized:', window.contacts.length, 'contacts loaded');
+
+// ESSENTIAL: Define toggleFavorite function IMMEDIATELY for HTML onclick handlers
+window.toggleFavorite = function(contactId) {
+    console.log('🌟 toggleFavorite called for ID:', contactId);
+    
+    // Debug: Check if window.contacts exists
+    if (!window.contacts) {
+        console.error('❌ window.contacts is not defined!');
+        return;
+    }
+    
+    const contact = window.contacts.find(c => c.id == contactId);
+    
+    if (contact) {
+        console.log('📞 Found contact:', contact.name, 'current favorite:', contact.favorite);
+        
+        // Toggle favorite status
+        contact.favorite = !contact.favorite;
+        console.log('🔄 New favorite status:', contact.favorite);
+        
+        // Save to localStorage immediately
+        const favorites = {};
+        window.contacts.forEach(c => {
+            if (c.favorite) favorites[c.id] = true;
+        });
+        localStorage.setItem('contactFavorites', JSON.stringify(favorites));
+        console.log('💾 Saved favorites to localStorage');
+        
+        // Update the existing HTML cards immediately
+        const contactCard = document.querySelector(`[data-contact-id="${contact.id}"]`);
+        if (contactCard) {
+            console.log(`🔄 Updating card for ${contact.name} - favorite: ${contact.favorite}`);
+            
+            // Show/hide based on favorite status - FAVORITES SHOULD BE VISIBLE
+            if (contact.favorite) {
+                contactCard.style.display = 'flex';
+                console.log(`✅ Showing favorite: ${contact.name}`);
+            } else {
+                contactCard.style.display = 'none';
+                console.log(`❌ Hiding non-favorite: ${contact.name}`);
+            }
+            
+            // Update favorite button appearance
+            const favoriteBtn = contactCard.querySelector('.favorite-btn');
+            const favoriteIcon = favoriteBtn?.querySelector('i');
+            
+            if (favoriteBtn && favoriteIcon) {
+                if (contact.favorite) {
+                    favoriteBtn.classList.add('active');
+                    favoriteBtn.setAttribute('title', 'Remove from Favorites');
+                    favoriteIcon.className = 'fas fa-star';
+                    console.log(`⭐ Updated star to filled for ${contact.name}`);
+                } else {
+                    favoriteBtn.classList.remove('active');
+                    favoriteBtn.setAttribute('title', 'Add to Favorites');
+                    favoriteIcon.className = 'far fa-star';
+                    console.log(`☆ Updated star to empty for ${contact.name}`);
+                }
+            }
+        } else {
+            console.error(`❌ No HTML card found for contact ID: ${contact.id}`);
+        }
+        
+        console.log(`${contact.name} ${contact.favorite ? 'added to' : 'removed from'} favorites`);
+        console.log('✅ toggleFavorite completed successfully');
+    } else {
+        console.error('❌ Contact not found for ID:', contactId);
+        console.log('Available contacts:', window.contacts.map(c => `${c.id}: ${c.name}`));
+    }
+};
+
+console.log('⭐ toggleFavorite function defined and ready');
+
+// Load favorites from localStorage on startup
+function loadFavoritesOnStartup() {
+    const savedFavorites = localStorage.getItem('contactFavorites');
+    if (savedFavorites) {
+        try {
+            const favorites = JSON.parse(savedFavorites);
+            console.log('📋 Loading favorites from localStorage:', favorites);
+            window.contacts.forEach(contact => {
+                contact.favorite = favorites[contact.id] || false;
+                console.log(`📞 ${contact.name} favorite: ${contact.favorite}`);
+            });
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+        }
+    } else {
+        console.log('📋 No saved favorites found, using defaults (Lynn Davis should be favorite)');
+        // Make sure defaults are preserved (Lynn Davis is favorite by default)
+        window.contacts.forEach(contact => {
+            console.log(`📞 Default: ${contact.name} favorite: ${contact.favorite}`);
+        });
+    }
+    
+    // Count current favorites
+    const currentFavorites = window.contacts.filter(c => c.favorite);
+    console.log(`⭐ Current favorites: ${currentFavorites.map(c => c.name).join(', ')}`);
+}
+
+// Load favorites immediately
+loadFavoritesOnStartup();
+
+// Initialize the HTML cards when DOM is ready
+function initializeFavoriteCards() {
+    console.log('🎨 Initializing favorite cards...');
+    let favoritesCount = 0;
+    
+    window.contacts.forEach(contact => {
+        const contactCard = document.querySelector(`[data-contact-id="${contact.id}"]`);
+        if (contactCard) {
+            console.log(`📋 Processing ${contact.name} (ID: ${contact.id}) - favorite: ${contact.favorite}`);
+            
+            // Show/hide based on favorite status - FAVORITES SHOULD BE VISIBLE
+            if (contact.favorite) {
+                contactCard.style.display = 'flex';
+                favoritesCount++;
+                console.log(`✅ Showing favorite: ${contact.name}`);
+            } else {
+                contactCard.style.display = 'none';
+                console.log(`❌ Hiding non-favorite: ${contact.name}`);
+            }
+            
+            // Update favorite button appearance
+            const favoriteBtn = contactCard.querySelector('.favorite-btn');
+            const favoriteIcon = favoriteBtn?.querySelector('i');
+            
+            if (favoriteBtn && favoriteIcon) {
+                if (contact.favorite) {
+                    favoriteBtn.classList.add('active');
+                    favoriteBtn.setAttribute('title', 'Remove from Favorites');
+                    favoriteIcon.className = 'fas fa-star';
+                } else {
+                    favoriteBtn.classList.remove('active');
+                    favoriteBtn.setAttribute('title', 'Add to Favorites');
+                    favoriteIcon.className = 'far fa-star';
+                }
+            }
+        } else {
+            console.error(`❌ No HTML card found for contact ID: ${contact.id}`);
+        }
+    });
+    
+    console.log(`🎨 Initialization complete: ${favoritesCount} favorites shown`);
+    
+    // If no favorites, show a message
+    if (favoritesCount === 0) {
+        console.log('⚠️ No favorites found - all contacts hidden');
+    }
+}
+
+// When DOM loads, initialize the cards
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🌟 DOM loaded, initializing favorite cards...');
+    initializeFavoriteCards();
+});
+
 console.log('🎯 FORCE LOADED YOUR CONTACTS:', window.globalContacts.map(c => c.name).join(', '));
 
 // Clear any cached contacts from localStorage to force fresh load
@@ -593,9 +754,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Update contact's favorite status
         toggleFavorite: function(contactId) {
-            const contact = globalContacts.find(c => c.id === contactId);
+            const contact = window.contacts.find(c => c.id == contactId);
             if (contact) {
                 contact.favorite = !contact.favorite;
+                saveFavorites();
                 this.updateAllContactDisplays();
                 showNotification(contact.favorite ? 'Added to favorites' : 'Removed from favorites');
                 return contact.favorite;
@@ -680,28 +842,22 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Update contacts display
         function updateContactsDisplay() {
             console.log('🔍 updateContactsDisplay called');
-            console.log('🔍 Current globalContacts:', globalContacts);
-            console.log('🔍 Contact names:', globalContacts.map(c => c.name));
             const favoritesGrid = document.getElementById('favoritesGrid');
             if (!favoritesGrid) {
                 console.log('❌ favoritesGrid element not found');
                 return;
             }
-            console.log('✅ Updating contact display with', globalContacts.length, 'contacts');
             
-            // FORCE use window.globalContacts if local globalContacts is wrong
-            const contactsToUse = window.globalContacts || globalContacts;
+            // Use window.contacts which has the favorites system
+            const contactsToUse = window.contacts || [];
             console.log('🎯 Using contacts:', contactsToUse.map(c => c.name));
 
-            // Get all contacts (favorites first) - FORCE use correct contacts
-            const allContacts = [...contactsToUse].sort((a, b) => {
-                if (a.favorite && !b.favorite) return -1;
-                if (!a.favorite && b.favorite) return 1;
-                return 0;
-            });
+            // Get only favorite contacts
+            const favoriteContacts = contactsToUse.filter(contact => contact.favorite);
+            console.log('⭐ Favorite contacts:', favoriteContacts.map(c => c.name));
 
-            favoritesGrid.innerHTML = allContacts.slice(0, 6).map(contact => `
-                <div class="contact-card ${contact.favorite ? 'favorite' : ''}" data-contact-id="${contact.id}">
+            favoritesGrid.innerHTML = favoriteContacts.map(contact => `
+                <div class="contact-card" data-contact-id="${contact.id}">
                     <div class="contact-checkbox">
                         <input type="checkbox" class="contact-select-checkbox" data-contact-id="${contact.id}" 
                                onchange="toggleContactSelection(${contact.id})">
@@ -3740,28 +3896,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.clearNotifications = clearNotifications;
     window.closeModal = closeModal;
 
-    // Essential contact functions for static HTML
-    window.toggleFavorite = function(contactId) {
-        const contact = globalContacts.find(c => c.id === contactId);
-        const card = document.querySelector(`[data-contact-id="${contactId}"]`);
-        const favoriteBtn = card.querySelector('.favorite-btn');
-        
-        if (contact) {
-            contact.favorite = !contact.favorite;
-            
-            if (contact.favorite) {
-                card.classList.add('favorite');
-                favoriteBtn.classList.add('active');
-                favoriteBtn.title = 'Remove from favorites';
-                showNotification(`${contact.name} added to favorites`);
-            } else {
-                card.classList.remove('favorite');
-                favoriteBtn.classList.remove('active');
-                favoriteBtn.title = 'Add to favorites';
-                showNotification(`${contact.name} removed from favorites`);
-            }
-        }
-    };
+    // toggleFavorite function is now defined at the top of the file
 
     window.removeContact = function(contactId) {
         const contact = globalContacts.find(c => c.id === contactId);
@@ -4790,4 +4925,311 @@ function loadContactUpdates() {
 
 // Load saved contacts when the page loads
 window.addEventListener('load', loadContactUpdates);
+
+// Use the globalContacts as the main contacts array
+window.contacts = window.globalContacts;
+
+// Load favorites from localStorage
+function loadFavorites() {
+    const savedFavorites = localStorage.getItem('contactFavorites');
+    if (savedFavorites) {
+        try {
+            const favorites = JSON.parse(savedFavorites);
+            console.log('📋 Loading favorites from localStorage:', favorites);
+            window.contacts.forEach(contact => {
+                contact.favorite = favorites[contact.id] || false;
+                console.log(`📞 ${contact.name} favorite: ${contact.favorite}`);
+            });
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+        }
+    } else {
+        console.log('📋 No saved favorites found, using defaults');
+    }
+}
+
+// Save favorites to localStorage
+function saveFavorites() {
+    const favorites = {};
+    window.contacts.forEach(contact => {
+        if (contact.favorite) {
+            favorites[contact.id] = true;
+        }
+    });
+    localStorage.setItem('contactFavorites', JSON.stringify(favorites));
+}
+
+// Update the contacts display to show only favorites
+function updateContactsDisplay() {
+    const favoritesGrid = document.getElementById('favoritesGrid');
+    if (!favoritesGrid) return;
+
+    const favoriteContacts = window.contacts.filter(contact => contact.favorite);
+    
+    if (favoriteContacts.length === 0) {
+        favoritesGrid.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-star" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
+                <h3>No Favorite Contacts</h3>
+                <p>Click the star button on any contact to add them to your favorites.</p>
+            </div>
+        `;
+        return;
+    }
+
+    favoritesGrid.innerHTML = favoriteContacts.map(contact => `
+        <div class="contact-card favorite" data-contact-id="${contact.id}">
+            <div class="contact-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="contact-info">
+                <h4>${contact.name}</h4>
+                <p class="contact-role">${contact.role}</p>
+                <p class="contact-status ${contact.status}">${contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}</p>
+            </div>
+            <div class="contact-actions">
+                <button class="contact-btn view-btn" title="View Contact" onclick="viewContactProfile(${contact.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="contact-btn" title="Send Message" onclick="sendMessage(${contact.id})">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                <button class="contact-btn favorite-btn active" title="Remove from Favorites" onclick="toggleFavorite(${contact.id})">
+                    <i class="fas fa-star"></i>
+                </button>
+                <button class="contact-btn delete-btn" onclick="removeContact(${contact.id})" title="Delete Contact">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Clear search and return to favorites view
+function clearSearch() {
+    console.log('🔄 Clearing search and returning to favorites view');
+    const searchInput = document.getElementById('userSearchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    initializeFavoriteCards(); // Show only favorites
+}
+
+// Search and Browse All Contacts Functionality
+function searchContacts() {
+    const searchInput = document.getElementById('userSearchInput');
+    const query = searchInput.value.toLowerCase().trim();
+    
+    if (!query) {
+        // If no search query, show favorites only
+        updateExistingContactCards();
+        return;
+    }
+    
+    // Show all contacts that match the search query (for favoriting)
+    showAllContactsForSearch(query);
+}
+
+function showAllContactsForSearch(query = '') {
+    console.log('🔍 showAllContactsForSearch called with query:', query);
+    
+    if (!query) {
+        // If no search query, show ALL contacts for browsing
+        console.log('📋 No query - showing all contacts for browsing');
+        window.contacts.forEach(contact => {
+            const contactCard = document.querySelector(`[data-contact-id="${contact.id}"]`);
+            if (contactCard) {
+                contactCard.style.display = 'flex';
+                console.log(`👀 Showing ${contact.name} for browsing`);
+            }
+        });
+        return;
+    }
+    
+    // Filter contacts based on search query
+    const matchingContacts = window.contacts.filter(contact => 
+        contact.name.toLowerCase().includes(query.toLowerCase()) ||
+        contact.role.toLowerCase().includes(query.toLowerCase()) ||
+        contact.status.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    console.log(`🔍 Found ${matchingContacts.length} contacts matching "${query}"`);
+    
+    // Show/hide contacts based on search results
+    window.contacts.forEach(contact => {
+        const contactCard = document.querySelector(`[data-contact-id="${contact.id}"]`);
+        if (contactCard) {
+            const matches = matchingContacts.find(c => c.id === contact.id);
+            contactCard.style.display = matches ? 'flex' : 'none';
+            if (matches) {
+                console.log(`✅ Showing search result: ${contact.name}`);
+            }
+        }
+    });
+    
+    // If no matches, show message (but don't replace HTML)
+    if (matchingContacts.length === 0) {
+        console.log('❌ No matches found for search query');
+    }
+}
+
+// clearSearch function already defined above
+
+// Initialize search functionality when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearchInput');
+    const searchBtn = document.getElementById('searchUserBtn');
+    
+    if (searchInput && searchBtn) {
+        // Search on button click
+        searchBtn.addEventListener('click', searchContacts);
+        
+        // Search on Enter key
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchContacts();
+            }
+        });
+        
+        // Real-time search as user types
+        searchInput.addEventListener('input', function() {
+            // Debounce the search to avoid too many calls
+            clearTimeout(window.searchTimeout);
+            window.searchTimeout = setTimeout(searchContacts, 300);
+        });
+        
+        console.log('🔍 Contact search functionality initialized');
+    }
+});
+
+// Initialize favorites system on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🌟 Initializing favorites system...');
+    loadFavorites();
+    updateExistingContactCards();
+    
+    // Set up search functionality
+    const searchInput = document.getElementById('userSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchContacts);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchContacts();
+            }
+        });
+    }
+});
+
+// Update existing HTML contact cards instead of replacing them
+function updateExistingContactCards() {
+    console.log('🔄 Updating existing contact cards...');
+    
+    // Hide non-favorite contacts and update favorite button states
+    window.contacts.forEach(contact => {
+        const contactCard = document.querySelector(`[data-contact-id="${contact.id}"]`);
+        if (contactCard) {
+            // Show/hide based on favorite status
+            if (contact.favorite) {
+                contactCard.style.display = 'flex';
+            } else {
+                contactCard.style.display = 'none';
+            }
+            
+            // Update favorite button appearance
+            const favoriteBtn = contactCard.querySelector('.favorite-btn');
+            const favoriteIcon = favoriteBtn?.querySelector('i');
+            
+            if (favoriteBtn && favoriteIcon) {
+                if (contact.favorite) {
+                    favoriteBtn.classList.add('active');
+                    favoriteBtn.setAttribute('title', 'Remove from Favorites');
+                    favoriteIcon.className = 'fas fa-star';
+                } else {
+                    favoriteBtn.classList.remove('active');
+                    favoriteBtn.setAttribute('title', 'Add to Favorites');
+                    favoriteIcon.className = 'far fa-star';
+                }
+            }
+        }
+    });
+}
+
+// Make functions available globally
+window.clearSearch = clearSearch;
+window.updateExistingContactCards = updateExistingContactCards;
+
+// Debug function to check system state
+window.debugFavorites = function() {
+    console.log('=== FAVORITES DEBUG ===');
+    console.log('Window contacts:', window.contacts);
+    console.log('Saved favorites:', localStorage.getItem('contactFavorites'));
+    if (window.contacts) {
+        window.contacts.forEach(contact => {
+            const card = document.querySelector(`[data-contact-id="${contact.id}"]`);
+            console.log(`${contact.name} (ID: ${contact.id}): favorite = ${contact.favorite}, visible = ${card ? card.style.display : 'no card'}`);
+        });
+    } else {
+        console.error('window.contacts is not defined!');
+    }
+};
+
+// Test function to verify clicking works
+window.testStarButton = function() {
+    console.log('🧪 Testing star button functionality...');
+    console.log('Current state:');
+    window.debugFavorites();
+    
+    console.log('Testing toggle on Lynn Davis (ID: 1)...');
+    window.toggleFavorite(1);
+    
+    console.log('State after toggle:');
+    window.debugFavorites();
+};
+
+// Complete system status check
+window.systemStatus = function() {
+    console.log('=== FAVORITES SYSTEM STATUS ===');
+    
+    // Check contacts
+    console.log('📞 Total contacts:', window.contacts?.length || 0);
+    
+    // Check favorites
+    const favorites = window.contacts?.filter(c => c.favorite) || [];
+    console.log('⭐ Current favorites:', favorites.map(c => c.name).join(', ') || 'None');
+    
+    // Check visible cards
+    let visibleCount = 0;
+    let hiddenCount = 0;
+    
+    window.contacts?.forEach(contact => {
+        const card = document.querySelector(`[data-contact-id="${contact.id}"]`);
+        if (card) {
+            if (card.style.display === 'none') {
+                hiddenCount++;
+                console.log(`❌ Hidden: ${contact.name} (favorite: ${contact.favorite})`);
+            } else {
+                visibleCount++;
+                console.log(`✅ Visible: ${contact.name} (favorite: ${contact.favorite})`);
+            }
+        } else {
+            console.log(`❓ No card found for: ${contact.name}`);
+        }
+    });
+    
+    console.log(`👀 Card status: ${visibleCount} visible, ${hiddenCount} hidden`);
+    console.log(`💾 localStorage favorites: ${localStorage.getItem('contactFavorites')}`);
+    
+    // Check if system is working correctly
+    if (favorites.length === visibleCount) {
+        console.log('✅ SYSTEM STATUS: WORKING CORRECTLY - Only favorites are visible');
+    } else {
+        console.log('❌ SYSTEM STATUS: ISSUE - Visible cards do not match favorites');
+    }
+};
+
+// Simple test function
+window.testClick = function(id) {
+    console.log('🧪 TEST CLICK for ID:', id);
+    alert('Test click works! ID: ' + id);
+};
 

@@ -546,17 +546,7 @@ h1 {
     border-color: rgba(102, 126, 234, 0.7);
 }
 
-.contact-card.favorite::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    border-radius: 17px;
-    z-index: -1;
-}
+/* Removed favorite border styling since we show favorites-only now */
 
 .contact-avatar {
     font-size: 3em;
