@@ -3742,13 +3742,44 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Essential contact functions for static HTML
     window.toggleFavorite = function(contactId) {
-        const contact = globalContacts.find(c => c.id === contactId);
-        const card = document.querySelector(`[data-contact-id="${contactId}"]`);
+        console.log('🌟 toggleFavorite called with contactId:', contactId);
+        console.log('🌟 contactId type:', typeof contactId);
+        console.log('🌟 globalContacts:', globalContacts);
+        
+        // Convert to number to ensure proper comparison
+        const numericContactId = parseInt(contactId);
+        console.log('🌟 numericContactId:', numericContactId);
+        
+        const contact = globalContacts.find(c => c.id == numericContactId);
+        console.log('🌟 Found contact:', contact);
+        
+        const card = document.querySelector(`[data-contact-id="${numericContactId}"]`);
+        console.log('🌟 Found card:', card);
+        
+        if (!card) {
+            console.error('❌ Card not found for contactId:', contactId);
+            return;
+        }
+        
         const favoriteBtn = card.querySelector('.favorite-btn');
+        console.log('🌟 Found favorite button:', favoriteBtn);
+        
+        if (!favoriteBtn) {
+            console.error('❌ Favorite button not found in card');
+            return;
+        }
+        
         const starIcon = favoriteBtn.querySelector('i');
+        console.log('🌟 Found star icon:', starIcon);
+        
+        if (!starIcon) {
+            console.error('❌ Star icon not found in favorite button');
+            return;
+        }
         
         if (contact) {
             contact.favorite = !contact.favorite;
+            console.log('🌟 Toggled favorite status to:', contact.favorite);
             
             if (contact.favorite) {
                 card.classList.add('favorite');
@@ -3756,6 +3787,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 favoriteBtn.title = 'Remove from favorites';
                 // Change to filled star
                 starIcon.className = 'fas fa-star';
+                console.log('🌟 Set star to filled (fas fa-star)');
                 showNotification(`${contact.name} added to favorites`);
             } else {
                 card.classList.remove('favorite');
@@ -3763,9 +3795,22 @@ document.addEventListener('DOMContentLoaded', async function () {
                 favoriteBtn.title = 'Add to favorites';
                 // Change to outline star
                 starIcon.className = 'far fa-star';
+                console.log('🌟 Set star to outline (far fa-star)');
                 showNotification(`${contact.name} removed from favorites`);
             }
+        } else {
+            console.error('❌ Contact not found for contactId:', contactId);
         }
+    };
+
+    // Test function to verify favorites work
+    window.testFavorites = function() {
+        console.log('🧪 Testing favorites functionality...');
+        console.log('🧪 Available contacts:', globalContacts.map(c => ({id: c.id, name: c.name, favorite: c.favorite})));
+        
+        // Try to toggle contact 2 (Kathy)
+        console.log('🧪 Attempting to toggle favorite for Kathy (ID: 2)');
+        window.toggleFavorite(2);
     };
 
     window.removeContact = function(contactId) {
