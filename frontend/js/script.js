@@ -48,14 +48,10 @@ console.log('✅ Immediate test function defined');
 console.log('🔥 DEFINING LOGOUT FUNCTION');
 window.handleLogout = function() {
     console.log('🚪 handleLogout function called');
-    alert('Logout function called! This should work now.');
     
-    // Simple test first - just clear and reload
-    console.log('Clearing localStorage...');
+    // Clear localStorage and reload
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
-    
-    console.log('Reloading page...');
     location.reload();
 };
 console.log('✅ handleLogout function defined');
