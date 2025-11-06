@@ -1440,29 +1440,35 @@
             <div id="browseAllPage" class="page-content" style="display: none;">
                 <section class="browse-all-section">
                     <div class="page-header">
-                        <button id="backToMainFromBrowse" class="back-btn" onclick="showMainPage()">
+                        <button id="backToMainFromBrowse" class="back-btn" onclick="document.getElementById('browseAllPage').style.display='none'; document.getElementById('mainPage').style.display='block';">
                             <i class="fas fa-arrow-left"></i>
                             Back to My Contacts
                         </button>
-                        <h2><i class="fas fa-users"></i> All Contacts</h2>
-                        <p>Browse through all available contacts in the system</p>
+                        <h2><i class="fas fa-users"></i> All My Contacts</h2>
+                        <p>Browse through all your added contacts</p>
                     </div>
 
-                    <!-- Search and Filter Controls -->
-                    <div class="browse-controls">
+                    <!-- Contact Search and Filter -->
+                    <div class="browse-contact-search">
+                        <div class="search-header">
+                            <h3><i class="fas fa-search"></i> Search Your Contacts</h3>
+                            <p>Find and manage your contact list</p>
+                        </div>
+
                         <div class="search-container">
                             <div class="search-box">
-                                <label for="browseSearchInput" class="sr-only">Search all contacts</label>
+                                <label for="browseSearchInput" class="sr-only">Search your contacts</label>
                                 <input type="text" id="browseSearchInput"
-                                    placeholder="Search all contacts..."
+                                    placeholder="Search by name, role, or status..."
                                     aria-describedby="browse-search-help">
                                 <button id="browseSearchBtn" class="search-btn" aria-describedby="browse-search-help">
                                     <i class="fas fa-search" aria-hidden="true"></i>
+                                    Search
                                 </button>
                             </div>
                         </div>
-                        
-                        <div class="browse-filters">
+
+                        <div class="search-filters">
                             <select id="browseRoleFilter" class="filter-select">
                                 <option value="">All Roles</option>
                                 <option value="Administrator">Administrator</option>
@@ -1470,54 +1476,35 @@
                             </select>
                             <select id="browseStatusFilter" class="filter-select">
                                 <option value="">All Status</option>
-                                <option value="Active">Online</option>
-                                <option value="Away">Away</option>
-                                <option value="Offline">Offline</option>
+                                <option value="online">Online</option>
+                                <option value="away">Away</option>
+                                <option value="offline">Offline</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Contacts Grid -->
-                    <div class="browse-contacts-container">
+                    <!-- Contacts Display -->
+                    <div class="browse-contacts-results">
                         <div class="contacts-count">
                             <span id="browseContactsCount">Loading contacts...</span>
-                        </div>
-                        
-                        <div class="browse-contacts-grid" id="browseContactsGrid">
-                            <!-- All contacts will be loaded here dynamically -->
                         </div>
 
                         <!-- Loading State -->
                         <div id="browseLoading" class="search-loading" style="display: none;">
                             <div class="loading-spinner"></div>
-                            <p>Loading all contacts...</p>
+                            <p>Loading your contacts...</p>
+                        </div>
+
+                        <!-- Contacts Grid -->
+                        <div id="browseContactsGrid" class="browse-contacts-grid" style="display: none;">
+                            <!-- Contacts will be loaded here -->
                         </div>
 
                         <!-- Empty State -->
                         <div id="browseEmpty" class="no-results" style="display: none;">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-address-book"></i>
                             <p>No contacts found</p>
-                            <small>Try adjusting your search criteria</small>
-                        </div>
-                    </div>
-
-                    <!-- Bulk Actions -->
-                    <div class="browse-bulk-actions" id="browseBulkActions" style="display: none;">
-                        <div class="bulk-actions-header">
-                            <div class="bulk-selection-info">
-                                <i class="fas fa-check-circle"></i>
-                                <span id="browseSelectedCount">0 contacts selected</span>
-                            </div>
-                            <div class="bulk-actions-buttons">
-                                <button class="bulk-action-btn favorite" onclick="bulkAddToFavoritesBrowse()">
-                                    <i class="fas fa-star"></i>
-                                    Add to Favorites
-                                </button>
-                                <button class="bulk-action-btn cancel" onclick="clearBrowseSelection()">
-                                    <i class="fas fa-times"></i>
-                                    Clear Selection
-                                </button>
-                            </div>
+                            <small>Try adjusting your search criteria or add some contacts</small>
                         </div>
                     </div>
                 </section>

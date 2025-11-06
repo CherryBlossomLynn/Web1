@@ -1,4 +1,6 @@
 // Enhanced Database Website JavaScript
+console.log('🚀 SCRIPT LOADING - JavaScript file is being executed at:', new Date().toLocaleTimeString());
+
 // FORCE SET YOUR CONTACT MANAGER CONTACTS FIRST - BEFORE ANYTHING ELSE
 window.globalContacts = [
     // Keep Lynn as requested
@@ -15,6 +17,64 @@ window.globalContacts = [
 window.contacts = window.globalContacts;
 
 console.log('🚀 Contacts initialized:', window.contacts.length, 'contacts loaded');
+
+// IMMEDIATE TEST FUNCTIONS - Available right away
+window.simpleTest = function() {
+    alert('Simple test works! JavaScript is functional.');
+};
+
+window.simpleBrowseTest = function() {
+    console.log('Testing simple browse...');
+    const mainPage = document.getElementById('mainPage');
+    const browsePage = document.getElementById('browseAllPage');
+    
+    if (mainPage && browsePage) {
+        mainPage.style.display = 'none';
+        browsePage.style.display = 'block';
+        alert('Page switch successful!');
+    } else {
+        alert('Pages not found. Main: ' + !!mainPage + ', Browse: ' + !!browsePage);
+    }
+};
+
+window.simpleBackTest = function() {
+    console.log('Testing simple back...');
+    const mainPage = document.getElementById('mainPage');
+    const browsePage = document.getElementById('browseAllPage');
+    
+    if (mainPage && browsePage) {
+        browsePage.style.display = 'none';
+        mainPage.style.display = 'block';
+        alert('Back button test successful!');
+    } else {
+        alert('Pages not found for back. Main: ' + !!mainPage + ', Browse: ' + !!browsePage);
+    }
+};
+
+// EARLY definition of showBrowseAllPage function for onclick reliability
+window.showBrowseAllPage = function() {
+    console.log('🚀 Early showBrowseAllPage called');
+    
+    const mainPage = document.getElementById('mainPage');
+    const browseAllPage = document.getElementById('browseAllPage');
+    
+    if (mainPage && browseAllPage) {
+        // Hide main page
+        mainPage.style.display = 'none';
+        // Show browse page
+        browseAllPage.style.display = 'block';
+        console.log('✅ Page switch completed');
+        
+        // Try to load contacts if the function exists
+        setTimeout(() => {
+            if (typeof loadAllContacts === 'function') {
+                loadAllContacts();
+            }
+        }, 100);
+    } else {
+        console.error('❌ Pages not found. Main:', !!mainPage, 'Browse:', !!browseAllPage);
+    }
+};
 
 // ESSENTIAL: Define toggleFavorite function IMMEDIATELY for HTML onclick handlers
 window.toggleFavorite = function(contactId) {
@@ -615,6 +675,24 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Initialize filter dropdown functionality
         initializeFilterDropdown();
+
+        // Initialize Browse All button
+        initializeBrowseAllButton();
+        
+        // Debug: Check if Browse All page exists
+        const browseAllPageDebug = document.getElementById('browseAllPage');
+        console.log('🔍 Browse All Page exists:', !!browseAllPageDebug);
+        if (browseAllPageDebug) {
+            console.log('📄 Browse All Page HTML:', browseAllPageDebug.outerHTML.substring(0, 200) + '...');
+        }
+        
+        // Add timestamp for cache debugging
+        console.log('🕒 Script loaded at:', new Date().toLocaleTimeString());
+        
+        // Test global function availability
+        console.log('🔍 Global functions available:');
+        console.log('  - showBrowseAllPage:', typeof window.showBrowseAllPage);
+        console.log('  - testBrowse:', typeof window.testBrowse);
 
         // Force contact display update after a short delay to ensure DOM is ready
         setTimeout(function() {
@@ -1665,94 +1743,163 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.openSearchPanel = openSearchPanel;
     window.closeSearchPanel = closeSearchPanel;
 
-    // Browse All Page Functions
+    // Browse All Page Functions (enhanced version of early function)
     function showBrowseAllPage() {
-        // Hide main page and show browse all page
-        document.getElementById('mainPage').style.display = 'none';
-        document.getElementById('browseAllPage').style.display = 'block';
+        console.log('🚀 Enhanced showBrowseAllPage called');
         
-        // Load all contacts
-        loadAllContacts();
+        const mainPage = document.getElementById('mainPage');
+        const browseAllPage = document.getElementById('browseAllPage');
+        const addContactPage = document.getElementById('addContactPage');
+        const accountPage = document.getElementById('accountPage');
         
-        // Initialize browse page functionality
-        initializeBrowsePage();
+        console.log('Switching to Browse All page...');
+        
+        // Hide all other pages
+        if (mainPage) mainPage.style.display = 'none';
+        if (addContactPage) addContactPage.style.display = 'none';
+        if (accountPage) accountPage.style.display = 'none';
+        
+        // Show browse page
+        if (browseAllPage) {
+            browseAllPage.style.display = 'block';
+            console.log('✅ Browse All page should now be visible');
+            
+            // Load contacts after page is visible
+            setTimeout(() => {
+                loadAllContacts();
+                if (typeof initializeBrowseSearch === 'function') {
+                    initializeBrowseSearch();
+                }
+            }, 100);
+        } else {
+            console.error('❌ Browse All page element not found');
+        }
     }
+    
+    // Update the global reference to use the enhanced version
+    window.showBrowseAllPage = showBrowseAllPage;
 
     function showMainPage() {
-        // Hide browse all page and show main page
-        document.getElementById('browseAllPage').style.display = 'none';
-        document.getElementById('mainPage').style.display = 'block';
+        console.log('🏠 showMainPage called');
         
-        // Clear any selections
-        clearBrowseSelection();
+        // Simple and direct approach
+        const mainPage = document.getElementById('mainPage');
+        const browseAllPage = document.getElementById('browseAllPage');
+        const addContactPage = document.getElementById('addContactPage');
+        const accountPage = document.getElementById('accountPage');
+        const contactDetailsPage = document.getElementById('contactDetailsPage');
+        
+        console.log('Pages found:', {
+            main: !!mainPage,
+            browse: !!browseAllPage,
+            addContact: !!addContactPage,
+            account: !!accountPage,
+            details: !!contactDetailsPage
+        });
+        
+        // Hide all other pages
+        if (browseAllPage) browseAllPage.style.display = 'none';
+        if (addContactPage) addContactPage.style.display = 'none';
+        if (accountPage) accountPage.style.display = 'none';
+        if (contactDetailsPage) contactDetailsPage.style.display = 'none';
+        
+        // Show main page
+        if (mainPage) {
+            mainPage.style.display = 'block';
+            console.log('✅ Main page should now be visible');
+            
+            // Refresh favorites display
+            if (typeof initializeFavoriteCards === 'function') {
+                setTimeout(() => {
+                    initializeFavoriteCards();
+                }, 100);
+            }
+        } else {
+            console.error('❌ Main page element not found!');
+            alert('Error: Cannot find main page element');
+        }
     }
 
     function loadAllContacts() {
+        console.log('📂 Loading user\'s added contacts...');
+        
         const browseGrid = document.getElementById('browseContactsGrid');
         const browseLoading = document.getElementById('browseLoading');
         const browseEmpty = document.getElementById('browseEmpty');
         const contactsCount = document.getElementById('browseContactsCount');
         
-        // Show loading
-        browseLoading.style.display = 'block';
-        browseGrid.style.display = 'none';
-        browseEmpty.style.display = 'none';
+        console.log('🎯 Browse elements:', {
+            browseGrid: !!browseGrid,
+            browseLoading: !!browseLoading,
+            browseEmpty: !!browseEmpty,
+            contactsCount: !!contactsCount
+        });
         
-        // Simulate loading delay
+        // Show loading
+        if (browseLoading) browseLoading.style.display = 'block';
+        if (browseGrid) browseGrid.style.display = 'none';
+        if (browseEmpty) browseEmpty.style.display = 'none';
+        
+        // Load user's added contacts from favorites (this is where added contacts are stored)
         setTimeout(() => {
-            const allContacts = window.contacts || [];
+            let myContacts = [];
             
-            browseLoading.style.display = 'none';
+            try {
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                myContacts = favorites;
+                console.log('👥 User contacts loaded from favorites:', myContacts.length, myContacts);
+            } catch (error) {
+                console.error('❌ Error loading user contacts:', error);
+            }
             
-            if (allContacts.length === 0) {
-                browseEmpty.style.display = 'block';
-                contactsCount.textContent = 'No contacts found';
+            if (browseLoading) browseLoading.style.display = 'none';
+            
+            if (myContacts.length === 0) {
+                console.log('⚠️ No added contacts found');
+                if (browseEmpty) browseEmpty.style.display = 'block';
+                if (contactsCount) contactsCount.textContent = 'No contacts in your list';
                 return;
             }
             
-            contactsCount.textContent = `${allContacts.length} contact${allContacts.length !== 1 ? 's' : ''} found`;
-            browseGrid.style.display = 'grid';
+            console.log(`✅ Rendering ${myContacts.length} user contacts`);
+            if (contactsCount) contactsCount.textContent = `${myContacts.length} contact${myContacts.length !== 1 ? 's' : ''} in your list`;
+            if (browseGrid) browseGrid.style.display = 'grid';
             
-            renderBrowseContacts(allContacts);
-        }, 800);
+            renderBrowseContacts(myContacts);
+        }, 500);
     }
 
     function renderBrowseContacts(contacts) {
         const browseGrid = document.getElementById('browseContactsGrid');
         
         const contactsHTML = contacts.map(contact => {
-            const isFavorite = contact.favorite;
-            const statusClass = contact.status.toLowerCase();
+            const statusClass = (contact.status || 'offline').toLowerCase();
             
             return `
-                <div class="browse-contact-card" data-contact-id="${contact.id}">
-                    <div class="browse-contact-select" onclick="toggleContactSelection(${contact.id})"></div>
-                    
-                    <div class="browse-contact-header">
-                        <div class="browse-contact-avatar">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="browse-contact-info">
-                            <h4>${contact.name}</h4>
-                            <p class="contact-role">${contact.role}</p>
-                            <span class="contact-status ${statusClass}">${contact.status}</span>
-                        </div>
+                <div class="contact-card" data-contact-id="${contact.id}">
+                    <div class="contact-avatar">
+                        <img src="${contact.avatar || 'images/default-avatar.png'}" 
+                             alt="${contact.name}" 
+                             onerror="this.src='images/default-avatar.png'">
+                        <div class="status-indicator status-${statusClass}"></div>
                     </div>
                     
-                    <div class="browse-contact-actions">
-                        <button class="browse-action-btn view" onclick="viewContactProfile(${contact.id})" title="View Profile">
-                            <i class="fas fa-eye"></i>
-                            <span>View</span>
+                    <div class="contact-info">
+                        <h4>${contact.name}</h4>
+                        <p class="contact-role">${contact.role || 'User'}</p>
+                        <p class="contact-status">${contact.status || 'Offline'}</p>
+                    </div>
+                    
+                    <div class="contact-actions">
+                        <button class="action-btn remove" 
+                                onclick="removeFromFavorites('${contact.id}'); loadAllContacts();" 
+                                title="Remove Contact">
+                            <i class="fas fa-trash"></i>
                         </button>
-                        <button class="browse-action-btn message" onclick="sendMessage(${contact.id})" title="Send Message">
-                            <i class="fas fa-envelope"></i>
-                            <span>Message</span>
-                        </button>
-                        <button class="browse-action-btn favorite ${isFavorite ? 'active' : ''}" 
-                                onclick="toggleFavoriteFromBrowse(${contact.id})" 
-                                title="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}">
-                            <i class="fas fa-star"></i>
-                            <span>${isFavorite ? 'Favorited' : 'Favorite'}</span>
+                        <button class="action-btn message" 
+                                onclick="startChat('${contact.id}')" 
+                                title="Send Message">
+                            <i class="fas fa-comment"></i>
                         </button>
                     </div>
                 </div>
@@ -1762,26 +1909,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         browseGrid.innerHTML = contactsHTML;
     }
 
-    function initializeBrowsePage() {
+    function initializeBrowseSearch() {
         const searchInput = document.getElementById('browseSearchInput');
         const searchBtn = document.getElementById('browseSearchBtn');
         const roleFilter = document.getElementById('browseRoleFilter');
         const statusFilter = document.getElementById('browseStatusFilter');
         
-        // Search functionality
+        // Search functionality for user's contacts
         const performBrowseSearch = () => {
             const query = searchInput.value.toLowerCase().trim();
             const roleValue = roleFilter.value;
             const statusValue = statusFilter.value;
             
-            let filteredContacts = window.contacts || [];
+            // Get user's contacts from favorites
+            let userContacts = [];
+            try {
+                userContacts = JSON.parse(localStorage.getItem('favorites') || '[]');
+            } catch (error) {
+                console.error('Error loading user contacts for search:', error);
+            }
+            
+            let filteredContacts = userContacts;
             
             // Filter by search query
             if (query) {
                 filteredContacts = filteredContacts.filter(contact => 
                     contact.name.toLowerCase().includes(query) ||
-                    contact.email.toLowerCase().includes(query) ||
-                    contact.role.toLowerCase().includes(query)
+                    (contact.role || '').toLowerCase().includes(query) ||
+                    (contact.status || '').toLowerCase().includes(query)
                 );
             }
             
@@ -1794,19 +1949,28 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             // Filter by status
             if (statusValue) {
-                const statusMap = {
-                    'Active': 'online',
-                    'Away': 'away', 
-                    'Offline': 'offline'
-                };
                 filteredContacts = filteredContacts.filter(contact => 
-                    contact.status === statusMap[statusValue]
+                    (contact.status || 'offline').toLowerCase() === statusValue.toLowerCase()
                 );
             }
             
-            renderBrowseContacts(filteredContacts);
-            document.getElementById('browseContactsCount').textContent = 
-                `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} found`;
+            // Update display
+            const browseGrid = document.getElementById('browseContactsGrid');
+            const browseEmpty = document.getElementById('browseEmpty');
+            const contactsCount = document.getElementById('browseContactsCount');
+            
+            if (filteredContacts.length > 0) {
+                renderBrowseContacts(filteredContacts);
+                if (browseGrid) browseGrid.style.display = 'grid';
+                if (browseEmpty) browseEmpty.style.display = 'none';
+            } else {
+                if (browseGrid) browseGrid.style.display = 'none';
+                if (browseEmpty) browseEmpty.style.display = 'block';
+            }
+            
+            if (contactsCount) {
+                contactsCount.textContent = `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} found`;
+            }
         };
         
         // Event listeners
@@ -1896,6 +2060,50 @@ document.addEventListener('DOMContentLoaded', async function () {
         }, 100);
     }
 
+    // Initialize Browse All button functionality
+    function initializeBrowseAllButton() {
+        console.log('🔄 Initializing Browse All button...');
+        
+        // Try multiple approaches to find the button
+        const browseAllBtn = document.getElementById('browseAllBtn');
+        const browseAllBtnQuery = document.querySelector('#browseAllBtn');
+        const browseAllBtnByClass = document.querySelector('button[onclick*="showBrowseAllPage"]');
+        
+        console.log('🔲 Browse All button by ID:', browseAllBtn);
+        console.log('🔲 Browse All button by querySelector:', browseAllBtnQuery);
+        console.log('🔲 Browse All button by onclick:', browseAllBtnByClass);
+        
+        const button = browseAllBtn || browseAllBtnQuery || browseAllBtnByClass;
+        
+        if (button) {
+            // DO NOT remove onclick - keep it as primary method
+            console.log('✅ Browse All button found, keeping onclick attribute');
+            console.log('� Current onclick:', button.getAttribute('onclick'));
+            
+            // Test the function is available
+            if (typeof showBrowseAllPage === 'function') {
+                console.log('✅ showBrowseAllPage function is available');
+            } else {
+                console.error('❌ showBrowseAllPage function not available');
+            }
+            
+        } else {
+            console.error('❌ Browse All button not found in DOM');
+            // List all buttons for debugging
+            const allButtons = document.querySelectorAll('button');
+            console.log('📋 All buttons found:', allButtons.length);
+            allButtons.forEach((btn, index) => {
+                console.log(`Button ${index}:`, btn.id, btn.textContent.trim());
+            });
+        }
+    }
+
+    // Simple test function
+    window.testBrowse = function() {
+        alert('JavaScript is working! Button should work too.');
+        return 'Test successful';
+    };
+    
     // Make browse functions globally available
     window.showBrowseAllPage = showBrowseAllPage;
     window.showMainPage = showMainPage;
