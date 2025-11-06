@@ -1415,6 +1415,45 @@
     <script src="../js/script.js"></script>
     <!-- Temporarily commented out to prevent conflicts -->
     <!-- <script src="../js/your-contacts.js"></script> -->
+    
+    <!-- Simple working star toggle function -->
+    <script>
+        // Override the toggleFavorite function with a simple working version
+        window.toggleFavorite = function(contactId) {
+            console.log('⭐ SIMPLE toggleFavorite called with contactId:', contactId);
+            
+            const card = document.querySelector(`[data-contact-id="${contactId}"]`);
+            if (!card) {
+                console.error('Card not found for contactId:', contactId);
+                return;
+            }
+            
+            const favoriteBtn = card.querySelector('.favorite-btn');
+            const starIcon = favoriteBtn.querySelector('i');
+            
+            if (!favoriteBtn || !starIcon) {
+                console.error('Button or icon not found');
+                return;
+            }
+            
+            // Check if currently favorited (has fas class for filled star)
+            const isFavorited = starIcon.classList.contains('fas');
+            
+            if (isFavorited) {
+                // Remove from favorites: change to outline star only
+                favoriteBtn.title = 'Add to favorites';
+                starIcon.className = 'far fa-star';
+                console.log('⭐ Removed from favorites - changed to outline star');
+            } else {
+                // Add to favorites: change to filled star only
+                favoriteBtn.title = 'Remove from favorites';
+                starIcon.className = 'fas fa-star';
+                console.log('⭐ Added to favorites - changed to filled star');
+            }
+        };
+        
+        console.log('⭐ Simple toggleFavorite function loaded');
+    </script>
 </body>
 
 </html>
