@@ -546,7 +546,17 @@ h1 {
     border-color: rgba(102, 126, 234, 0.7);
 }
 
-/* Removed favorite card background - now using black star instead */
+.contact-card.favorite::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border-radius: 17px;
+    z-index: -1;
+}
 
 .contact-avatar {
     font-size: 3em;
@@ -627,24 +637,14 @@ h1 {
     transform: scale(1.1);
 }
 
-/* Black star for favorite contacts */
-.contact-card .contact-btn.favorite-btn.active i.fas.fa-star,
-.contact-card .contact-action-btn.favorite-btn.active i,
-.contact-card .contact-action-btn.favorite-btn.active,
-.contact-btn.favorite-btn.active i.fas.fa-star,
-#detailsFavoriteIcon.fas.fa-star,
-.favorite-active #detailsFavoriteIcon {
-    color: #000000 !important;
-}
-
 .favorite-btn.active {
-    background: rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
-    color: #000000;
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.5);
+    color: #ffd700;
 }
 
 .favorite-btn.active:hover {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(255, 215, 0, 0.3);
 }
 
 .recent-contacts-list {
