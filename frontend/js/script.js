@@ -3745,6 +3745,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const contact = globalContacts.find(c => c.id === contactId);
         const card = document.querySelector(`[data-contact-id="${contactId}"]`);
         const favoriteBtn = card.querySelector('.favorite-btn');
+        const starIcon = favoriteBtn.querySelector('i');
         
         if (contact) {
             contact.favorite = !contact.favorite;
@@ -3753,11 +3754,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                 card.classList.add('favorite');
                 favoriteBtn.classList.add('active');
                 favoriteBtn.title = 'Remove from favorites';
+                // Change to filled star
+                starIcon.className = 'fas fa-star';
                 showNotification(`${contact.name} added to favorites`);
             } else {
                 card.classList.remove('favorite');
                 favoriteBtn.classList.remove('active');
                 favoriteBtn.title = 'Add to favorites';
+                // Change to outline star
+                starIcon.className = 'far fa-star';
                 showNotification(`${contact.name} removed from favorites`);
             }
         }
