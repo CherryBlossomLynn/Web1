@@ -1,23 +1,80 @@
 // Enhanced Database Website JavaScript
 console.log('🚀 SCRIPT LOADING - JavaScript file is being executed at:', new Date().toLocaleTimeString());
 
-// FORCE SET YOUR CONTACT MANAGER CONTACTS FIRST - BEFORE ANYTHING ELSE
-window.globalContacts = [
-    // Keep Lynn as requested
-    { id: 1, name: 'Lynn Davis', role: 'Administrator', status: 'online', favorite: true, lastViewed: Date.now() - 7200000, email: 'lynn@lynnsdatabase.local', phone: '+1 (555) 123-4567', birthday: '1988-11-04', bio: 'Database Administrator with over 8 years of experience in managing enterprise-level database systems. Specializes in MySQL, PostgreSQL, and data security protocols.', interests: { videogames: ['Database Management Games'], physicalGames: ['Chess', 'Strategy Board Games'], media: ['Tech Documentaries', 'Cybersecurity Films'] } },
-    // Your real contacts from Contact Manager database with interests based on games/gametypes tables
-    { id: 2, name: 'Kathy', role: 'User', status: 'offline', favorite: false, lastViewed: Date.now() - 86400000, email: '', phone: '', birthday: '', bio: 'Contact from your Contact Manager database. Enjoys card games and movies.', interests: { videogames: ['Casual Mobile Games'], physicalGames: ['Uno', 'Hopscotch', 'Jump Rope'], media: ['Romance Movies', 'Comedy Films', 'TV Dramas'] } },
-    { id: 3, name: 'Michael', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 3600000, email: '', phone: '4694266925', birthday: '', bio: 'Contact from your Contact Manager database. Gaming enthusiast and movie lover.', interests: { videogames: ['Minecraft', 'Action Games', 'RPGs'], physicalGames: ['Monopoly', 'Card Games', 'Basketball'], media: ['Action Movies', 'Gaming Streams', 'Adventure Films'] } },
-    { id: 4, name: 'Nathan', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 7200000, email: 'NathanLorenzen1@gmail.com', phone: '8649154169', birthday: '2000-06-07', bio: 'Contact from your Contact Manager database. Tech-savvy gamer born in 2000.', interests: { videogames: ['VR Games', 'Virtual Reality', 'Tech Simulators'], physicalGames: ['Tech Gadgets', 'Puzzle Games'], media: ['Sci-Fi Movies', 'Tech Reviews', 'Gaming Content'] } },
-    { id: 5, name: 'Willie', role: 'User', status: 'away', favorite: false, lastViewed: Date.now() - 43200000, email: 'atuasmedium@gmail.com', phone: '', birthday: '1999-11-29', bio: 'Contact from your Contact Manager database. Enjoys traditional games and entertainment.', interests: { videogames: ['Classic Arcade Games'], physicalGames: ['Uno', 'Checkers', 'Traditional Games'], media: ['Classic Movies', 'Old TV Shows', 'Documentaries'] } },
-    { id: 6, name: 'Scarlett', role: 'User', status: 'online', favorite: false, lastViewed: Date.now() - 1800000, email: 'Scarlettfromash@gmail.com', phone: '9124679551', birthday: '2007-05-16', bio: 'Contact from your Contact Manager database. Young gamer who loves variety.', interests: { videogames: ['Minecraft', 'Mobile Games', 'Creative Games'], physicalGames: ['Tag', 'Board Games', 'Sports'], media: ['Teen Movies', 'Music Videos', 'Social Media Content'] } }
-];
-
-// IMMEDIATELY set window.contacts to point to globalContacts
+// Initialize empty contacts array - will be populated from database
+window.globalContacts = [];
 window.contacts = window.globalContacts;
 
-console.log('🚀 Contacts initialized:', window.contacts.length, 'contacts loaded');
-console.log('📋 Initial contact states:', window.contacts.map(c => `${c.name}(ID:${c.id}): favorite=${c.favorite}`));
+// Load contacts from database
+async function loadContactsFromDatabase() {
+    try {
+        console.log('🗄️ Loading contacts from MySQL database...');
+        
+        const response = await fetch('/api/contacts');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.success && data.contacts) {
+            // Transform database contacts to match expected structure
+            window.globalContacts = data.contacts.map(contact => ({
+                id: contact.ID,  // Database uses uppercase ID
+                name: contact.Name,
+                role: 'User', // Default role since DB doesn't have role field
+                status: 'online', // Default status 
+                favorite: false, // Will be loaded from localStorage
+                lastViewed: Date.now(),
+                email: contact.email || '',
+                phone: contact.phone || '',
+                birthday: contact.birthday || '',
+                bio: contact.bio || `Contact from your Contact Manager database.`,
+                interests: {
+                    videogames: [],
+                    physicalGames: [],
+                    media: []
+                }
+            }));
+            
+            // Load favorite status from localStorage
+            const favorites = JSON.parse(localStorage.getItem('contactFavorites') || '{}');
+            window.globalContacts.forEach(contact => {
+                contact.favorite = favorites[contact.id] === true;
+            });
+            
+            // Update window.contacts reference
+            window.contacts = window.globalContacts;
+            
+            console.log('✅ Database contacts loaded:', window.contacts.length, 'contacts');
+            console.log('📋 Loaded contacts:', window.contacts.map(c => `${c.name}(ID:${c.id})`));
+            
+            // Refresh any displayed contact lists
+            setTimeout(() => {
+                if (typeof updateContactsDisplay === 'function') {
+                    updateContactsDisplay();
+                }
+                // Don't auto-call copyExistingContactCards here as it will be called when Browse All page is opened
+                
+                // Trigger custom event to let other parts of the app know contacts are loaded
+                window.dispatchEvent(new CustomEvent('contactsLoaded', { detail: window.globalContacts }));
+            }, 100);
+            
+            return window.globalContacts;
+        } else {
+            throw new Error('Invalid response format from server');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load contacts from database:', error);
+        // Fallback to empty array
+        window.globalContacts = [];
+        window.contacts = window.globalContacts;
+        return [];
+    }
+}
+
+// Load contacts immediately
+console.log('� Starting contact database load...');
+loadContactsFromDatabase();
 
 // IMMEDIATE TEST FUNCTIONS - Available right away
 window.simpleTest = function() {
@@ -102,21 +159,21 @@ function loadAllContacts() {
     if (browseGrid) browseGrid.style.display = 'none';
     if (browseEmpty) browseEmpty.style.display = 'none';
     
-    // Load ALL contacts (both favorited and unfavorited) 
-    setTimeout(() => {
+    // Load ALL contacts from database
+    setTimeout(async () => {
         console.log('� Loading ALL contacts for Browse All page');
         
         if (browseLoading) browseLoading.style.display = 'none';
         
-        // Display ALL contacts from globalContacts array
-        copyExistingContactCards();
+        // Display ALL contacts from database
+        await copyExistingContactCards();
         console.log('✅ All contacts displayed in Browse All page successfully');
     }, 300);
 }
 
 // Display ALL contacts (both favorited and unfavorited) in Browse All page
-function copyExistingContactCards() {
-    console.log('📋 Displaying ALL contacts in Browse All page');
+async function copyExistingContactCards() {
+    console.log('📋 Displaying ALL contacts from database in Browse All page');
     
     const browseGrid = document.getElementById('browseContactsGrid');
     const browseEmpty = document.getElementById('browseEmpty');
@@ -127,9 +184,15 @@ function copyExistingContactCards() {
         return;
     }
     
-    // Get ALL contacts from globalContacts (both favorited and unfavorited)
+    // Ensure contacts are loaded from database
+    if (window.globalContacts.length === 0) {
+        console.log('📋 Contacts not loaded yet, fetching from database...');
+        await loadContactsFromDatabase();
+    }
+    
+    // Get ALL contacts from globalContacts (loaded from database)
     const allContacts = window.globalContacts || [];
-    console.log(`📋 Found ${allContacts.length} total contacts (favorited and unfavorited)`);
+    console.log(`📋 Found ${allContacts.length} total contacts from database`);
     
     if (allContacts.length === 0) {
         console.log('⚠️ No contacts found in globalContacts');
@@ -145,6 +208,10 @@ function copyExistingContactCards() {
         const favoriteClass = contact.favorite ? 'active' : '';
         const starIcon = contact.favorite ? 'fas fa-star' : 'far fa-star';
         const favoriteTitle = contact.favorite ? 'Remove from Favorites' : 'Add to Favorites';
+        
+        console.log(`🏗️ Generating HTML for contact: ${contact.name} (ID: ${contact.id})`);
+        console.log(`🏗️ onclick will be: viewContactProfile(${contact.id})`);
+        console.log(`🏗️ Contact object:`, contact);
         
         return `
             <div class="contact-card" data-contact-id="${contact.id}">
@@ -175,7 +242,20 @@ function copyExistingContactCards() {
     }).join('');
     
     // Update the browse grid with ALL contacts
+    console.log('🏗️ Generated HTML preview (first 500 chars):', contactsHTML.substring(0, 500));
     browseGrid.innerHTML = contactsHTML;
+    
+    // Verify the HTML was set correctly
+    console.log('🏗️ Verifying contact cards in DOM...');
+    const contactCards = browseGrid.querySelectorAll('.contact-card');
+    contactCards.forEach((card, index) => {
+        const contactId = card.getAttribute('data-contact-id');
+        const nameElement = card.querySelector('.contact-info h4');
+        const contactName = nameElement ? nameElement.textContent : 'Unknown';
+        const viewButton = card.querySelector('.view-btn');
+        const viewButtonOnclick = viewButton ? viewButton.getAttribute('onclick') : 'No onclick';
+        console.log(`🏗️ Card ${index + 1}: Name="${contactName}", data-contact-id="${contactId}", onclick="${viewButtonOnclick}"`);
+    });
     if (contactsCount) contactsCount.textContent = `${allContacts.length} contact${allContacts.length !== 1 ? 's' : ''} in your database`;
     if (browseEmpty) browseEmpty.style.display = 'none';
     if (browseGrid) browseGrid.style.display = 'grid';
@@ -933,16 +1013,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.ContactsManager = {
         // Add a new contact to the global list
         addContact: function(user) {
-            // Check if contact already exists
-            const existingContact = globalContacts.find(c => c.id === user.id);
+            // Check if contact already exists by name and email to avoid duplicates
+            const existingContact = globalContacts.find(c => 
+                c.name === user.name && c.email === user.email
+            );
             if (existingContact) {
                 showNotification(`${user.name} is already in your contacts`);
                 return false;
             }
 
-            // Create new contact object
+            // Generate a unique ID that doesn't conflict with existing contacts
+            const existingIds = globalContacts.map(c => c.id);
+            const maxId = Math.max(...existingIds, 0);
+            const uniqueId = maxId + 1;
+
+            // Create new contact object with unique ID
             const newContact = {
-                id: user.id,
+                id: uniqueId,
                 name: user.name,
                 role: user.role,
                 status: user.status === 'Active' ? 'online' : 'offline',
@@ -954,6 +1041,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 department: user.department || 'Unknown',
                 bio: user.bio || 'No bio available'
             };
+
+            console.log(`📝 Creating new contact with unique ID ${uniqueId} for ${user.name} (original ID was ${user.id})`);
 
             globalContacts.push(newContact);
             this.updateAllContactDisplays();
@@ -4473,14 +4562,34 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Global view contact profile function (outside DOMContentLoaded for onclick access)
 window.viewContactProfile = function(contactId) {
-    console.log('🔍 viewContactProfile called with ID:', contactId);
+    console.log('🔍🔍 ===========================================');
+    console.log('🔍🔍 viewContactProfile called with ID:', contactId, 'Type:', typeof contactId);
     
     // Convert contactId to number if it's a string
     const numericId = parseInt(contactId);
+    console.log('🔍🔍 Converted to numeric ID:', numericId);
     
-    // Find the contact
-    const contact = window.globalContacts.find(c => c.id == contactId || c.id == numericId);
+    // TEST: Let's see what we find for each ID manually
+    console.log('🔍🔍 MANUAL ID TEST:');
+    window.globalContacts.forEach((contact, index) => {
+        console.log(`🔍🔍 globalContacts[${index}]: ID=${contact.id}, Name="${contact.name}"`);
+        if (contact.id === numericId) {
+            console.log(`🔍🔍 ✅ MATCH FOUND: ID ${numericId} matches ${contact.name}`);
+        }
+    });
+    
+    // Find the contact in globalContacts (loaded from database)
+    const contact = window.globalContacts.find(c => c.id === numericId);
+    console.log('📋 Available database contacts:', window.globalContacts.map(c => `ID:${c.id} -> ${c.name}`));
+    console.log('📋 Looking for numeric ID:', numericId);
     console.log('📋 Found contact:', contact);
+    console.log('📋 Found contact name:', contact ? contact.name : 'NOT FOUND');
+    
+    // Also check if there are any other contact arrays that might be interfering
+    if (window.contacts && window.contacts !== window.globalContacts) {
+        console.log('⚠️ WARNING: window.contacts is different from globalContacts!');
+        console.log('📋 window.contacts:', window.contacts.map(c => `${c.id}: ${c.name}`));
+    }
     
     if (contact) {
         // Update last viewed timestamp using ContactsManager if available
@@ -4578,14 +4687,26 @@ window.viewContactProfile = function(contactId) {
             }
         }
         
-        // Hide main page and show contact details page
+        // Hide all pages and show contact details page
         console.log('🔄 Switching to contact details page');
         const mainPage = document.getElementById('mainPage');
+        const browseAllPage = document.getElementById('browseAllPage');
         const detailsPage = document.getElementById('contactDetailsPage');
         console.log('📄 Main page element:', mainPage);
+        console.log('📄 Browse All page element:', browseAllPage);
         console.log('📄 Details page element:', detailsPage);
         
+        // Determine which page is currently visible and store it for back navigation
+        let currentPage = 'mainPage'; // default
+        if (browseAllPage && browseAllPage.style.display !== 'none') {
+            currentPage = 'browseAllPage';
+        }
+        window.previousPage = currentPage;
+        console.log('📄 Storing previous page:', currentPage);
+        
+        // Hide both main page and browse all page
         if (mainPage) mainPage.style.display = 'none';
+        if (browseAllPage) browseAllPage.style.display = 'none';
         if (detailsPage) detailsPage.style.display = 'block';
         
         if (window.showNotification) {
@@ -4597,6 +4718,42 @@ window.viewContactProfile = function(contactId) {
         if (window.showNotification) {
             window.showNotification('Contact not found!', 'error');
         }
+    }
+};
+
+// TEST FUNCTION - Check contact ID mapping
+window.testContactMapping = function() {
+    console.log('🧪 TESTING CONTACT ID MAPPING:');
+    console.log('🧪 globalContacts array:');
+    window.globalContacts.forEach((contact, index) => {
+        console.log(`🧪 Index ${index}: ID=${contact.id}, Name="${contact.name}"`);
+    });
+    
+    console.log('🧪 Testing viewContactProfile for each ID:');
+    for (let i = 1; i <= 6; i++) {
+        const found = window.globalContacts.find(c => c.id === i);
+        console.log(`🧪 ID ${i} should find: ${found ? found.name : 'NOT FOUND'}`);
+    }
+};
+
+// Smart back function that returns to the correct previous page
+window.goBackFromContactDetails = function() {
+    console.log('📄 Going back to previous page:', window.previousPage);
+    
+    const mainPage = document.getElementById('mainPage');
+    const browseAllPage = document.getElementById('browseAllPage');
+    const detailsPage = document.getElementById('contactDetailsPage');
+    
+    // Hide contact details page
+    if (detailsPage) detailsPage.style.display = 'none';
+    
+    // Show the correct previous page
+    if (window.previousPage === 'browseAllPage' && browseAllPage) {
+        browseAllPage.style.display = 'block';
+        console.log('📄 Returned to Browse All page');
+    } else if (mainPage) {
+        mainPage.style.display = 'block';
+        console.log('📄 Returned to Main page');
     }
 };
 
