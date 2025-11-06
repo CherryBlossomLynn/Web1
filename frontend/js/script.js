@@ -1665,6 +1665,245 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.openSearchPanel = openSearchPanel;
     window.closeSearchPanel = closeSearchPanel;
 
+    // Browse All Page Functions
+    function showBrowseAllPage() {
+        // Hide main page and show browse all page
+        document.getElementById('mainPage').style.display = 'none';
+        document.getElementById('browseAllPage').style.display = 'block';
+        
+        // Load all contacts
+        loadAllContacts();
+        
+        // Initialize browse page functionality
+        initializeBrowsePage();
+    }
+
+    function showMainPage() {
+        // Hide browse all page and show main page
+        document.getElementById('browseAllPage').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'block';
+        
+        // Clear any selections
+        clearBrowseSelection();
+    }
+
+    function loadAllContacts() {
+        const browseGrid = document.getElementById('browseContactsGrid');
+        const browseLoading = document.getElementById('browseLoading');
+        const browseEmpty = document.getElementById('browseEmpty');
+        const contactsCount = document.getElementById('browseContactsCount');
+        
+        // Show loading
+        browseLoading.style.display = 'block';
+        browseGrid.style.display = 'none';
+        browseEmpty.style.display = 'none';
+        
+        // Simulate loading delay
+        setTimeout(() => {
+            const allContacts = window.contacts || [];
+            
+            browseLoading.style.display = 'none';
+            
+            if (allContacts.length === 0) {
+                browseEmpty.style.display = 'block';
+                contactsCount.textContent = 'No contacts found';
+                return;
+            }
+            
+            contactsCount.textContent = `${allContacts.length} contact${allContacts.length !== 1 ? 's' : ''} found`;
+            browseGrid.style.display = 'grid';
+            
+            renderBrowseContacts(allContacts);
+        }, 800);
+    }
+
+    function renderBrowseContacts(contacts) {
+        const browseGrid = document.getElementById('browseContactsGrid');
+        
+        const contactsHTML = contacts.map(contact => {
+            const isFavorite = contact.favorite;
+            const statusClass = contact.status.toLowerCase();
+            
+            return `
+                <div class="browse-contact-card" data-contact-id="${contact.id}">
+                    <div class="browse-contact-select" onclick="toggleContactSelection(${contact.id})"></div>
+                    
+                    <div class="browse-contact-header">
+                        <div class="browse-contact-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="browse-contact-info">
+                            <h4>${contact.name}</h4>
+                            <p class="contact-role">${contact.role}</p>
+                            <span class="contact-status ${statusClass}">${contact.status}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="browse-contact-actions">
+                        <button class="browse-action-btn view" onclick="viewContactProfile(${contact.id})" title="View Profile">
+                            <i class="fas fa-eye"></i>
+                            <span>View</span>
+                        </button>
+                        <button class="browse-action-btn message" onclick="sendMessage(${contact.id})" title="Send Message">
+                            <i class="fas fa-envelope"></i>
+                            <span>Message</span>
+                        </button>
+                        <button class="browse-action-btn favorite ${isFavorite ? 'active' : ''}" 
+                                onclick="toggleFavoriteFromBrowse(${contact.id})" 
+                                title="${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}">
+                            <i class="fas fa-star"></i>
+                            <span>${isFavorite ? 'Favorited' : 'Favorite'}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        browseGrid.innerHTML = contactsHTML;
+    }
+
+    function initializeBrowsePage() {
+        const searchInput = document.getElementById('browseSearchInput');
+        const searchBtn = document.getElementById('browseSearchBtn');
+        const roleFilter = document.getElementById('browseRoleFilter');
+        const statusFilter = document.getElementById('browseStatusFilter');
+        
+        // Search functionality
+        const performBrowseSearch = () => {
+            const query = searchInput.value.toLowerCase().trim();
+            const roleValue = roleFilter.value;
+            const statusValue = statusFilter.value;
+            
+            let filteredContacts = window.contacts || [];
+            
+            // Filter by search query
+            if (query) {
+                filteredContacts = filteredContacts.filter(contact => 
+                    contact.name.toLowerCase().includes(query) ||
+                    contact.email.toLowerCase().includes(query) ||
+                    contact.role.toLowerCase().includes(query)
+                );
+            }
+            
+            // Filter by role
+            if (roleValue) {
+                filteredContacts = filteredContacts.filter(contact => 
+                    contact.role === roleValue
+                );
+            }
+            
+            // Filter by status
+            if (statusValue) {
+                const statusMap = {
+                    'Active': 'online',
+                    'Away': 'away', 
+                    'Offline': 'offline'
+                };
+                filteredContacts = filteredContacts.filter(contact => 
+                    contact.status === statusMap[statusValue]
+                );
+            }
+            
+            renderBrowseContacts(filteredContacts);
+            document.getElementById('browseContactsCount').textContent = 
+                `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} found`;
+        };
+        
+        // Event listeners
+        if (searchBtn) searchBtn.addEventListener('click', performBrowseSearch);
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performBrowseSearch();
+            });
+        }
+        if (roleFilter) roleFilter.addEventListener('change', performBrowseSearch);
+        if (statusFilter) statusFilter.addEventListener('change', performBrowseSearch);
+    }
+
+    let browseSelectedContacts = new Set();
+
+    function toggleContactSelection(contactId) {
+        const selectEl = document.querySelector(`[data-contact-id="${contactId}"] .browse-contact-select`);
+        const cardEl = document.querySelector(`[data-contact-id="${contactId}"]`);
+        
+        if (browseSelectedContacts.has(contactId)) {
+            browseSelectedContacts.delete(contactId);
+            selectEl.classList.remove('selected');
+            cardEl.classList.remove('selected');
+        } else {
+            browseSelectedContacts.add(contactId);
+            selectEl.classList.add('selected');
+            cardEl.classList.add('selected');
+        }
+        
+        updateBrowseBulkActions();
+    }
+
+    function clearBrowseSelection() {
+        browseSelectedContacts.clear();
+        document.querySelectorAll('.browse-contact-select').forEach(el => {
+            el.classList.remove('selected');
+        });
+        document.querySelectorAll('.browse-contact-card').forEach(el => {
+            el.classList.remove('selected');
+        });
+        updateBrowseBulkActions();
+    }
+
+    function updateBrowseBulkActions() {
+        const bulkActions = document.getElementById('browseBulkActions');
+        const selectedCount = document.getElementById('browseSelectedCount');
+        
+        if (browseSelectedContacts.size > 0) {
+            bulkActions.style.display = 'block';
+            selectedCount.textContent = `${browseSelectedContacts.size} contact${browseSelectedContacts.size !== 1 ? 's' : ''} selected`;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+    }
+
+    function bulkAddToFavoritesBrowse() {
+        browseSelectedContacts.forEach(contactId => {
+            toggleFavorite(contactId);
+        });
+        
+        // Update the display
+        setTimeout(() => {
+            loadAllContacts();
+            clearBrowseSelection();
+        }, 100);
+    }
+
+    function toggleFavoriteFromBrowse(contactId) {
+        toggleFavorite(contactId);
+        
+        // Update the button display
+        setTimeout(() => {
+            const contact = window.contacts.find(c => c.id === contactId);
+            const btn = document.querySelector(`[data-contact-id="${contactId}"] .browse-action-btn.favorite`);
+            const icon = btn.querySelector('i');
+            const text = btn.querySelector('span');
+            
+            if (contact && contact.favorite) {
+                btn.classList.add('active');
+                btn.title = 'Remove from Favorites';
+                text.textContent = 'Favorited';
+            } else {
+                btn.classList.remove('active');
+                btn.title = 'Add to Favorites';
+                text.textContent = 'Favorite';
+            }
+        }, 100);
+    }
+
+    // Make browse functions globally available
+    window.showBrowseAllPage = showBrowseAllPage;
+    window.showMainPage = showMainPage;
+    window.toggleContactSelection = toggleContactSelection;
+    window.clearBrowseSelection = clearBrowseSelection;
+    window.bulkAddToFavoritesBrowse = bulkAddToFavoritesBrowse;
+    window.toggleFavoriteFromBrowse = toggleFavoriteFromBrowse;
+
     function showCustomizationTabs() {
         // Scroll to customization tabs within the account page
         const customizationSection = document.querySelector('.customization-section');
